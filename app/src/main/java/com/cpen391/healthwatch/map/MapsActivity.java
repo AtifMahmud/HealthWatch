@@ -108,12 +108,12 @@ public class MapsActivity  extends FragmentActivity implements OnMapReadyCallbac
             MarkerOptions markerOptions = (new MarkerOptions().position(location).title(type + " in " + loc).icon(CustomIcons.getIcon(type)));
             MapItem mItem = new MapItem(location, "foo", "bar", CustomIcons.getIcon(type));
             mClusterManager.addItem(mItem);
+            mClusterManager.cluster();
 
         } catch (JSONException e){
             e.printStackTrace();
         }
 
-        mClusterManager.cluster();
     }
 
     /**
