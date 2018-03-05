@@ -11,6 +11,7 @@
  *      3. https://stackoverflow.com/questions/28736419/parsing-json-array-and-object-in-android
  *      4. https://stackoverflow.com/questions/1520887/how-to-pause-sleep-thread-or-process-in-android
  *      5. https://stackoverflow.com/questions/18486503/android-google-maps-api-v2-how-to-change-marker-icon
+ *      6. https://stackoverflow.com/questions/29983733/adding-new-markers-on-map-using-cluster-manager-doesnt-reflect-the-changes-unti
  *
  * FOR REFERENCE:
  *       {
@@ -29,11 +30,15 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.example.atifm.healthwatch.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +47,7 @@ import org.json.JSONObject;
 public class MapsActivity  extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,19 +95,25 @@ public class MapsActivity  extends FragmentActivity implements OnMapReadyCallbac
      *                   Must contain the fields: place, type, latitude and longitude.
      */
     private void addMarker(JSONObject jsonMarker) {
+        ClusterManager<MapItem> mClusterManager = new ClusterManager<MapItem>(this, getMap());
+
+        //getMap().setOnCameraIdleListener((GoogleMap.OnCameraIdleListener) mClusterManager);
+        //getMap().setOnMarkerClickListener(mClusterManager);
+
         try {
             String loc = jsonMarker.getString("place");
             String type = jsonMarker.getString("type");
 
             LatLng location = new LatLng(jsonMarker.getDouble("latitude"), jsonMarker.getDouble("longitude"));
+            MarkerOptions markerOptions = (new MarkerOptions().position(location).title(type + " in " + loc).icon(CustomIcons.getIcon(type)));
+            MapItem mItem = new MapItem(location, "foo", "bar", CustomIcons.getIcon(type));
+            mClusterManager.addItem(mItem);
 
-            MarkerOptions marker = (new MarkerOptions().position(location).title(type + " in " + loc));
-            marker.icon(CustomIcons.getIcon(type));
-
-            mMap.addMarker(marker);
         } catch (JSONException e){
             e.printStackTrace();
         }
+
+        mClusterManager.cluster();
     }
 
     /**
@@ -112,7 +124,13 @@ public class MapsActivity  extends FragmentActivity implements OnMapReadyCallbac
 
         locationsArray.put(genStubJsonLocation("ambulance", "-34", "151", "Sydney"));
         locationsArray.put(genStubJsonLocation("hospital", "23", "90", "Dhaka"));
-        locationsArray.put(genStubJsonLocation("ambulance", "49", "-123", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.2613790", "-123.2570520", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.263790", "-123.2520", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.26790", "-123.2570520", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.2690", "-123.20520", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.26130", "-123.220", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.2613790", "-123.20", "Vancouver"));
+        locationsArray.put(genStubJsonLocation("ambulance", "49.2613790", "-123.2570520", "Vancouver"));
 
         return locationsArray;
     }
@@ -128,5 +146,9 @@ public class MapsActivity  extends FragmentActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
         return null;
+    }
+
+    public GoogleMap getMap() {
+        return mMap;
     }
 }
