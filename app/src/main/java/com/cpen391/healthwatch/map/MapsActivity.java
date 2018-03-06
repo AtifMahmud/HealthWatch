@@ -26,8 +26,10 @@
 
 package com.cpen391.healthwatch.map;
 
+import android.graphics.Camera;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.example.atifm.healthwatch.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,7 +46,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MapsActivity  extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity  extends FragmentActivity implements
+        OnMapReadyCallback{
 
     private GoogleMap mMap;
 
@@ -83,7 +86,17 @@ public class MapsActivity  extends FragmentActivity implements OnMapReadyCallbac
                 e.printStackTrace();
             }
         }
+
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener(){
+            @Override
+            public void onCameraIdle(){
+                // To test
+
+            }
+        });
+
     }
+
 
     /**
      * Adds a marker onto the map.
