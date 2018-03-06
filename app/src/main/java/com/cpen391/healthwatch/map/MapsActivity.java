@@ -46,10 +46,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class MapsActivity  extends FragmentActivity implements
         OnMapReadyCallback{
 
     private GoogleMap mMap;
+    ArrayList<MarkerOptions> mMarkerList = new ArrayList<MarkerOptions>();
 
 
     @Override
@@ -72,9 +75,10 @@ public class MapsActivity  extends FragmentActivity implements
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    @Override
+    @Override-
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
 
         JSONArray locationsArray = genTestLocations();
 
@@ -91,7 +95,8 @@ public class MapsActivity  extends FragmentActivity implements
             @Override
             public void onCameraIdle(){
                 // To test
-
+                setMarkerVisibility(mMarkerList, 1);
+                addMarkersToMap(mMarkerList);
             }
         });
 
@@ -110,19 +115,18 @@ public class MapsActivity  extends FragmentActivity implements
     private void addMarker(JSONObject jsonMarker) {
         ClusterManager<MapItem> mClusterManager = new ClusterManager<MapItem>(this, getMap());
 
-        //getMap().setOnCameraIdleListener((GoogleMap.OnCameraIdleListener) mClusterManager);
-        //getMap().setOnMarkerClickListener(mClusterManager);
 
         try {
             String loc = jsonMarker.getString("place");
             String type = jsonMarker.getString("type");
 
             LatLng location = new LatLng(jsonMarker.getDouble("latitude"), jsonMarker.getDouble("longitude"));
-            MarkerOptions markerOptions = (new MarkerOptions().position(location).title(type + " in " + loc).icon(CustomIcons.getIcon(type)));
-            MapItem mItem = new MapItem(location, "foo", "bar", CustomIcons.getIcon(type));
-            mClusterManager.addItem(mItem);
-            mClusterManager.cluster();
-
+            MarkerOptions marker = (new MarkerOptions().position(location).title(type + " in " + loc).icon(CustomIcons.getIcon(type)));
+//            MapItem mItem = new MapItem(location, "foo", "bar", CustomIcons.getIcon(type));
+//            mClusterManager.addItem(mItem);
+//            mClusterManager.cluster();
+            mMarkerList.add(marker);
+            setMarkerVisibility(mMarkerList, 0);
         } catch (JSONException e){
             e.printStackTrace();
         }
@@ -160,6 +164,21 @@ public class MapsActivity  extends FragmentActivity implements
         }
         return null;
     }
+
+    private void setMarkerVisibility(ArrayList<MarkerOptions> list, int show){
+        for (int i = 0; i < list.size(); i++){
+            MarkerOptions marker = list.get(i);
+            marker.alpha(show);
+        }
+    }
+
+    private void addMarkersToMap(ArrayList<MarkerOptions> list){
+        for (int i = 0; i < list.size(); i++){
+            MarkerOptions marker = list.get(i);
+            mMap.addMarker(marker);
+        }
+    }
+
 
     public GoogleMap getMap() {
         return mMap;

@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cpen391.healthwatch.map.MapsActivity;
+// import com.cpen391.healthwatch.server.ServerCommunication;
 import com.example.atifm.healthwatch.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+       // GlobalFactory.setServerInterface(new ServerCommunication());
 
         final Button testMapsButton = (Button) findViewById(R.id.testMap);
         testMapsButton.setOnClickListener(new View.OnClickListener(){
