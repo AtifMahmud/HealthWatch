@@ -1,3 +1,13 @@
+/**
+ *
+ * Activity for the patient activity page
+ *
+ * Sources:
+ *      1. https://www.youtube.com/watch?v=InkQJ4riGyI
+ *
+ */
+
+
 package com.cpen391.healthwatch.patient;
 
 import android.os.Bundle;
@@ -17,15 +27,5 @@ public class PatientActivity extends AppCompatActivity {
         setContentView(R.layout.activity_patient);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
-
 }

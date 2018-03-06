@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.cpen391.healthwatch.patient.PatientActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
