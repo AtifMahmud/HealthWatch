@@ -1,6 +1,6 @@
 package com.cpen391.healthwatch.map;
 
-/**
+/*
  * Created by atifm on 3/5/2018.
  *
  * Implements an Item to add as type to ClusterItem
@@ -13,7 +13,6 @@ package com.cpen391.healthwatch.map;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
 public class MapItem implements ClusterItem{
