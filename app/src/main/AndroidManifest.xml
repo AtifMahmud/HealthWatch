@@ -38,7 +38,7 @@
             android:value="AIzaSyBoIKpzOUBgWx8E8XRSGIIANjBLNMc7Us0" />
 
         <activity
-            android:name="com.cpen391.healthwatch.map.MapsActivity"
+            android:name="com.cpen391.healthwatch.map.MapActivity"
             android:label="@string/title_activity_custom_icon_maps"/>
     </application>
 

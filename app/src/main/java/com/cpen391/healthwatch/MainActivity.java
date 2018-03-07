@@ -13,7 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.cpen391.healthwatch.map.MapsActivity;
+import com.cpen391.healthwatch.map.MapActivity;
+import com.cpen391.healthwatch.map.marker.animation.MarkerAnimationFactory;
 import com.cpen391.healthwatch.server.abstraction.AppControlInterface;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.implementation.AppControl;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Navigate to the map activity
     public void showMap(){
-        Intent mapIntent = new Intent(this, MapsActivity.class);
+        Intent mapIntent = new Intent(this, MapActivity.class);
         startActivity(mapIntent);
     }
 
@@ -67,5 +68,6 @@ public class MainActivity extends AppCompatActivity {
         AppControlInterface appControl = new AppControl(getApplicationContext());
         GlobalFactory.setAppControlInterface(appControl);
         GlobalFactory.setServerInterface(new ServerContact(appControl));
+        GlobalFactory.setAbstractMarkerAnimationFactory(new MarkerAnimationFactory());
     }
 }

@@ -1,4 +1,4 @@
-package com.cpen391.healthwatch.map;
+package com.cpen391.healthwatch.map.marker;
 
 import com.example.atifm.healthwatch.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
