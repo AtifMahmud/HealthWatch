@@ -1,4 +1,4 @@
-package com.cpen391.healthwatch.server;
+package com.cpen391.healthwatch.server.implementation;
 
 import android.content.Context;
 import android.util.Log;
@@ -98,7 +98,8 @@ public class AppControl implements AppControlInterface {
             @Override
             public boolean verify(String hostname, SSLSession sslSession) {
                 HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
-                return hv.verify(ServerCommunication.HOST, sslSession);
+                Log.d(TAG, "hostname: " + hostname);
+                return hv.verify(hostname, sslSession);
             }
         };
     }
