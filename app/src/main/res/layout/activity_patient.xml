@@ -58,7 +58,7 @@
             android:textSize="14sp" />
 
     </RelativeLayout>
-    
+
     <android.support.design.widget.FloatingActionButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,5 +75,21 @@
         android:layout_height="200dp"
         android:scaleType="centerCrop"
         android:src="@drawable/cover" />
+
+    <TextView
+        android:id="@+id/BPM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/profile_image"
+        android:layout_below="@+id/profile_layout"
+        android:layout_marginTop="23dp"
+        android:text="75 BPM"
+        android:textSize="30sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/BPM" />
 
 </RelativeLayout>
