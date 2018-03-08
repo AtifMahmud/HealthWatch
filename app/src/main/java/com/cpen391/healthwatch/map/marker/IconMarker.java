@@ -55,12 +55,16 @@ public class IconMarker {
         return null;
     }
 
-    /**
-     * Sets the marker interface associated with this icon marker.
-     * @param marker marker to associate.
-     */
-    public void setMarker(MarkerInterface marker) {
-        mMarker = marker;
+    public LatLng getPosition() {
+        return mPosition;
+    }
+
+    public String getMarkerId() {
+        return mMarkerId;
+    }
+
+    public String getType() {
+        return mType;
     }
 
     /**

@@ -1,4 +1,4 @@
-/**
+/*
  * This activity will show the locations on the map with custom icons. Before the server is set-up, test
  * with dummy JSON.
  *
@@ -23,7 +23,6 @@
  *
  */
 
-
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;
@@ -36,6 +35,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MapInterface.OnCameraIdleListener;
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
@@ -43,7 +43,6 @@ import com.cpen391.healthwatch.map.implementation.CustomGoogleMap;
 import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.util.GlobalFactory;
-import com.example.atifm.healthwatch.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;

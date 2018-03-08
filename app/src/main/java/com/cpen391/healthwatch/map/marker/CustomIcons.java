@@ -1,6 +1,6 @@
 package com.cpen391.healthwatch.map.marker;
 
-import com.example.atifm.healthwatch.R;
+import com.cpen391.healthwatch.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
