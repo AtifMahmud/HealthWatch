@@ -5,4 +5,7 @@
     <item
         android:gravity="center"
         android:drawable="@drawable/ic_launcher_background"/>
+    <item
+        android:gravity="center"
+        android:drawable="@drawable/hospital_icon"/>
 </layer-list>
