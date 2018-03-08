@@ -13,26 +13,18 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
     </android.support.design.widget.AppBarLayout>
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="57dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="Best User Profile"
         android:textAlignment="center"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.325"
         tools:layout_editor_absoluteX="0dp" />
@@ -50,23 +42,10 @@
         app:civ_border_width="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.459"
+        app:layout_constraintHorizontal_bias="0.455"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.125" />
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="125dp"
-        android:layout_height="99dp"
-        android:ems="10"
-        android:fontFamily="sans-serif"
-        android:inputType="number"
-        android:text="64 BPM"
-        android:textSize="30sp"
-        android:typeface="monospace"
-        tools:layout_editor_absoluteX="32dp"
-        tools:layout_editor_absoluteY="287dp" />
+        app:layout_constraintVertical_bias="0.129" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
@@ -87,21 +66,10 @@
         android:text="HELP !!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.825"
+        app:layout_constraintHorizontal_bias="0.921"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.625" />
-
-    <EditText
-        android:id="@+id/editText2"
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textUri|textEmailAddress"
-        android:text="bestuser@healthwatch.ca"
-        android:textSize="14sp"
-        tools:layout_editor_absoluteX="99dp"
-        tools:layout_editor_absoluteY="213dp" />
+        app:layout_constraintVertical_bias="0.54" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar2"
@@ -112,5 +80,53 @@
         android:theme="?attr/actionBarTheme"
         tools:layout_editor_absoluteX="-12dp"
         tools:layout_editor_absoluteY="525dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="bestuser@healthwatch.ca"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.39" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="+880-178-9171062"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.426" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="67dp"
+        android:layout_height="58dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="64 BPM"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.119"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.535" />
 
 </android.support.constraint.ConstraintLayout>
