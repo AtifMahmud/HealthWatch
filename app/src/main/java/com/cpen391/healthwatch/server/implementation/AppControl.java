@@ -7,8 +7,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
+import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.server.abstraction.AppControlInterface;
-import com.example.atifm.healthwatch.R;
 
 import java.io.IOException;
 import java.io.InputStream;

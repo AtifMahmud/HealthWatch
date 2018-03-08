@@ -1,8 +1,5 @@
 package com.cpen391.healthwatch.stub;
 
-import android.content.Context;
-import android.graphics.Point;
-
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
 import com.google.android.gms.maps.model.LatLng;
@@ -14,42 +11,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
  */
 public class StubMap implements MapInterface {
     @Override
-    public boolean setMapStyle(Context context, int resId) {
-        return false;
-    }
-
-    @Override
     public void setMaxZoomPreference(float zoomPreference) {
-
-    }
-
-    @Override
-    public void setMapToolbarEnabled(boolean enabled) {
-
-    }
-
-    @Override
-    public void setOnMarkerClickListener(OnMarkerClickListener clickListener) {
-
-    }
-
-    @Override
-    public void setOnMapClickListener(OnMapClickListener clickListener) {
-
-    }
-
-    @Override
-    public Point projectToScreenLocation(LatLng latLng) {
-        return null;
-    }
-
-    @Override
-    public LatLng projectFromScreenLocation(Point point) {
-        return null;
-    }
-
-    @Override
-    public void animateCamera(LatLng latLng, float zoomLevel) {
 
     }
 
@@ -74,17 +36,7 @@ public class StubMap implements MapInterface {
     }
 
     @Override
-    public void setOnInfoWindowClickListener(OnInfoWindowClickListener listener) {
-
-    }
-
-    @Override
     public void setMyLocationEnabled(boolean enabled) {
-
-    }
-
-    @Override
-    public void clear() {
 
     }
 }
