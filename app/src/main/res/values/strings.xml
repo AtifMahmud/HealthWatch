@@ -7,4 +7,5 @@
     <string name="already_a_member">Already a member? Login</string>
     <string name="username">Username</string>
     <string name="sign_up_logo_image_desc">Sign Up Image Logo</string>
+    <string name="alpha_num_sequence">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
 </resources>
