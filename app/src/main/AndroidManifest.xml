@@ -41,6 +41,11 @@
         <activity
             android:name="com.cpen391.healthwatch.map.MapActivity"
             android:label="@string/title_activity_custom_icon_maps"/>
+
+        <activity
+            android:name=".patient.PatientActivity"
+            android:label="@string/title_activity_patient"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
