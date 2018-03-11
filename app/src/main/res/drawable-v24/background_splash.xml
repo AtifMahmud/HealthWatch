@@ -4,8 +4,5 @@
         android:drawable="@color/colorPrimaryDark"/>
     <item
         android:gravity="center"
-        android:drawable="@drawable/ic_launcher_background"/>
-    <item
-        android:gravity="center"
-        android:drawable="@drawable/hospital_icon"/>
+        android:drawable="@drawable/circle"/>
 </layer-list>

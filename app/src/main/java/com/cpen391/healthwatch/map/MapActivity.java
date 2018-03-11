@@ -62,7 +62,6 @@ public class MapActivity extends FragmentActivity implements
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
-    private boolean mMarkersInvisible; // true if markers are currently invisible, false if the are visible.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +79,8 @@ public class MapActivity extends FragmentActivity implements
     }
 
     /**
-     * Initializes stuff on the map.
+     * Initializes stuff on the map. Can be used to inject the map dependency to allow for
+     * unit testing.
      *
      * @param mapInterface the map to initialize.
      */
@@ -99,7 +99,7 @@ public class MapActivity extends FragmentActivity implements
         for (int i = 0; i < locationsArray.length(); i++) {
             try {
                 addMarker(locationsArray.getJSONObject(i));
-            } catch (JSONException e){
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -117,17 +117,11 @@ public class MapActivity extends FragmentActivity implements
     private void checkToUpdateMarkers() {
         final float MARKER_DISPLAY_ZOOM_LEVEL = 15.0f;
         if (mMap.getCameraZoomLevel() > MARKER_DISPLAY_ZOOM_LEVEL) {
-            if (mMarkersInvisible) {
-                Log.d(TAG, "Displaying current markers");
-                displayCurrentMarkers();
-                mMarkersInvisible = false;
-            }
+            Log.d(TAG, "Displaying current markers");
+            displayCurrentMarkers();
         } else {
-            if (!mMarkersInvisible) {
-                Log.d(TAG, "Hiding current markers");
-                hideCurrentMarkers();
-                mMarkersInvisible = true;
-            }
+            Log.d(TAG, "Hiding current markers");
+            hideCurrentMarkers();
         }
     }
 
@@ -224,6 +218,12 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Set a marker's visibility by using a transition.
+     *
+     * @param marker the marker to manipulate.
+     * @param fadeIn true to fade marker in, false to fade marker out.
+     */
     private void setMarkerVisible(final MarkerInterface marker, boolean fadeIn) {
         MarkerAnimator animator;
         if (fadeIn) {

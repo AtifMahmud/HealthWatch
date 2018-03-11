@@ -15,7 +15,6 @@ import java.util.Map;
  * Created by william on 2018/3/6.
  * A class that allows you to make request to the server that could include a string body.
  */
-
 public class CustomStringRequest extends StringRequest {
     private Map<String, String> mHeaders;
     private String mBodyContentType;
