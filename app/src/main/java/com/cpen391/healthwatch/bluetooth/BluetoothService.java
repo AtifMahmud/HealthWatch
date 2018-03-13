@@ -9,16 +9,26 @@ package com.cpen391.healthwatch.bluetooth;
  * Sources:
  *      1. https://developer.android.com/reference/android/app/Service.html#onStartCommand(android.content.Intent, int, int)
  *      2. https://developer.android.com/guide/topics/connectivity/bluetooth.html
+ *      3. https://www.androidauthority.com/community/threads/trying-to-get-a-list-of-available-bluetooth-devices.25490/  --- ???
+ *      4. https://developer.android.com/guide/topics/ui/dialogs.html
  *
  */
 
+
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
+
 
 public class BluetoothService extends Service {
+
+
     public BluetoothService() {
+
     }
 
     @Override
@@ -32,17 +42,25 @@ public class BluetoothService extends Service {
 
         // Check if bluetooth adapter exists
         if (mBluetoothAdapter == null){
-            // Bluetooth not available
+            Toast.makeText(this, "Sorry, bluetooth unavailable", Toast.LENGTH_SHORT).show();
         }
 
-        // If bluetooth is not connected, request permission to turn bluetooth on
-        if (!mBluetoothAdapter.isEnabled()){
-            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBluetooth);
-        }
+        else {
+            // If bluetooth is not connected, request permission to turn bluetooth on
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivity(enableBluetooth);
+                Toast.makeText(this, "Bluetooth Turned On", Toast.LENGTH_SHORT).show();
+            }
 
-        // We want this service to continue running until it is explicitly
-        // stopped, so return sticky.
-        return START_STICKY;
+            if (mBluetoothAdapter.isEnabled()) {
+                Toast.makeText(this, "Show Devices", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+            // We want this service to continue running until it is explicitly
+            // stopped, so return sticky.
+            return START_STICKY;
     }
+
 }

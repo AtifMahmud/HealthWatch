@@ -3,6 +3,8 @@
     package="com.cpen391.healthwatch">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -22,7 +24,13 @@
         <service
             android:name=".bluetooth.BluetoothService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity
+            android:name=".bluetooth.BluetoothActivity"
+            android:label="@string/title_activity_bluetooth"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
     </application>
 
 </manifest>
