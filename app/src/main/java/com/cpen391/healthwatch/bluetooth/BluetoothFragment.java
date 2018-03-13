@@ -12,11 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.cpen391.healthwatch.R;
-
 import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,8 +59,8 @@ public class BluetoothFragment extends DialogFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // String num = Long.toString(getItemId(i));
-                Toast.makeText(getContext(), "CLICKED", Toast.LENGTH_SHORT).show();
+                String name =  mDevicesAdapter.getItem(i);
+                Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
             }
         });
     }
