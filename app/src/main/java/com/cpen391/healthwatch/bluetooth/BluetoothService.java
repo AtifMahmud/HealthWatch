@@ -3,7 +3,7 @@ package com.cpen391.healthwatch.bluetooth;
 /**
  * Service to handle bluetooth funtionality. We are using a service over activity because we want the functionality to be rather long term.
  *
- * @author: Atif Mahmud]
+ * @author: Atif Mahmud
  * @since: 2018-03-03
  *
  * Sources:
@@ -17,10 +17,9 @@ package com.cpen391.healthwatch.bluetooth;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
+import android.provider.Settings;
 import android.widget.Toast;
 
 
@@ -54,7 +53,9 @@ public class BluetoothService extends Service {
             }
 
             if (mBluetoothAdapter.isEnabled()) {
-                Toast.makeText(this, "Show Devices", Toast.LENGTH_SHORT).show();
+                Intent openBluetoothSettings = new Intent();
+                openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
+                startActivity(openBluetoothSettings);
             }
 
         }
