@@ -39,43 +39,12 @@ public class BluetoothActivity extends AppCompatActivity {
         checkLocationPermission();
     }
 
-    private void connectBluetooth(){
-           mBluetoothAdapter = ((BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
-
-            // Check if bluetooth adapter exists
-            if (mBluetoothAdapter == null){
-                Toast.makeText(this, "Sorry, bluetooth unavailable", Toast.LENGTH_SHORT).show();
-            }
-
-            else {
-                // If bluetooth is not connected, request permission to turn bluetooth on
-                if (!mBluetoothAdapter.isEnabled()) {
-                    Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(enableBluetooth, REQUEST_BLUETOOTH);
-                }
-
-                if (mBluetoothAdapter.isEnabled()) {
-                    Toast.makeText(this, "Show Devices", Toast.LENGTH_SHORT).show();
-                    Intent openBluetoothSettings = new Intent();
-                    openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
-                    startActivity(openBluetoothSettings);
-                }
-
-            }
+    private void startBtService(){
+        mBluetoothAdapter = ((BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+        Intent bluetoothService = new Intent(this, BluetoothService.class);
+        startService(bluetoothService);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (requestCode == REQUEST_BLUETOOTH){
-            if (resultCode == RESULT_OK){
-                Toast.makeText(this, "Bluetooth Turned On", Toast.LENGTH_SHORT).show();
-                openBluetoothSettingsMenu();
-
-            } else {
-                Toast.makeText(this, "Bluetooth turned off. Go to settings to turn on", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
@@ -84,7 +53,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     REQUEST_COARSE_LOCATION);
         } else {
-            connectBluetooth();
+            enableBluetooth();
         }
     }
 
@@ -93,23 +62,56 @@ public class BluetoothActivity extends AppCompatActivity {
         if (requestCode == REQUEST_COARSE_LOCATION) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                connectBluetooth();
+                startBtService();
             } else {
                 Toast.makeText(this, "Need permission to use bluetooth", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public void openBluetoothSettingsMenu(){
-        Intent openBluetoothSettings = new Intent();
-        openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
-        startActivity(openBluetoothSettings);
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
+    }
+
+
+    private void setUpBluetooth(){
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // Check if bluetooth adapter exists
+        if (mBluetoothAdapter == null){
+            Toast.makeText(this, "Sorry, bluetooth unavailable", Toast.LENGTH_SHORT).show();
+        }
+
+        else {
+            // If bluetooth is not connected, request permission to turn bluetooth on
+            if (!mBluetoothAdapter.isEnabled()) {
+                enableBluetooth();
+            } else if (mBluetoothAdapter.isEnabled()) {
+                startBtService();
+            }
+
+        }
+
+    }
+
+
+    private void enableBluetooth(){
+        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableBtIntent, REQUEST_BLUETOOTH);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (requestCode == REQUEST_BLUETOOTH){
+            if (resultCode == RESULT_OK){
+                startBtService();
+            } else{
+                Toast.makeText(this, "App needs bluetoth to run", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

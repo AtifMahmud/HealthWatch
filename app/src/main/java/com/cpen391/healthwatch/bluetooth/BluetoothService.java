@@ -22,8 +22,12 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import static android.support.v4.app.ActivityCompat.startActivityForResult;
+
 
 public class BluetoothService extends Service {
+
+    private static final int BLUETOOTH_PERMISSION = 1;
 
 
     public BluetoothService() {
@@ -37,31 +41,20 @@ public class BluetoothService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // Check if bluetooth adapter exists
-        if (mBluetoothAdapter == null){
-            Toast.makeText(this, "Sorry, bluetooth unavailable", Toast.LENGTH_SHORT).show();
-        }
+            Toast.makeText(this, "Bluetooth Service running, please connect to HealthWatch Device", Toast.LENGTH_LONG).show();
+            showBtSettings();
 
-        else {
-            // If bluetooth is not connected, request permission to turn bluetooth on
-            if (!mBluetoothAdapter.isEnabled()) {
-                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivity(enableBluetooth);
-                Toast.makeText(this, "Bluetooth Turned On", Toast.LENGTH_SHORT).show();
-            }
-
-            if (mBluetoothAdapter.isEnabled()) {
-                Intent openBluetoothSettings = new Intent();
-                openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
-                startActivity(openBluetoothSettings);
-            }
-
-        }
             // We want this service to continue running until it is explicitly
             // stopped, so return sticky.
             return START_STICKY;
+    }
+
+
+    private void showBtSettings(){
+        Intent openBluetoothSettings = new Intent();
+        openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
+        startActivity(openBluetoothSettings);
     }
 
 }
