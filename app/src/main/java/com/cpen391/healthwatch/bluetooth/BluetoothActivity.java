@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -28,29 +29,29 @@ public class BluetoothActivity extends AppCompatActivity {
     private static final int REQUEST_BLUETOOTH = 1;
     private static final int REQUEST_COARSE_LOCATION = 2;
     private String TAG = BluetoothActivity.class.getSimpleName();
-    private BluetoothFragment mBluetoothFragment;
+    //private BluetoothFragment mBluetoothFragment;
     private BluetoothAdapter mBluetoothAdapter;
 
 
-
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.d(TAG, "action: " + action);
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Discovery has found a device. Get the BluetoothDevice
-                // object and its info from the Intent.
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                Log.d(TAG, String.format("Device Found, name: %s, address: %s", deviceName, deviceHardwareAddress));
-                if (mBluetoothFragment != null) {
-                    mBluetoothFragment.addBluetoothDevice(deviceName, deviceHardwareAddress);
-                }
-            }
-        }
-    };
+//
+//    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            Log.d(TAG, "action: " + action);
+//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+//                // Discovery has found a device. Get the BluetoothDevice
+//                // object and its info from the Intent.
+//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//                String deviceName = device.getName();
+//                String deviceHardwareAddress = device.getAddress(); // MAC address
+//                Log.d(TAG, String.format("Device Found, name: %s, address: %s", deviceName, deviceHardwareAddress));
+//                if (mBluetoothFragment != null) {
+//                    mBluetoothFragment.addBluetoothDevice(deviceName, deviceHardwareAddress);
+//                }
+//            }
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class BluetoothActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bluetooth);
         checkLocationPermission();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mReceiver, filter);
+       // registerReceiver(mReceiver, filter);
     }
 
     private void connectBluetooth(){
@@ -90,8 +91,11 @@ public class BluetoothActivity extends AppCompatActivity {
         if (requestCode == REQUEST_BLUETOOTH){
             if (resultCode == RESULT_OK){
                 Toast.makeText(this, "Bluetooth Turned On", Toast.LENGTH_SHORT).show();
-                mBluetoothAdapter.startDiscovery();
-                displayBluetoothDeviceDialog();
+               // mBluetoothAdapter.startDiscovery();
+               // displayBluetoothDeviceDialog();
+               Intent openBluetoothSettings = new Intent();
+               openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
+               startActivity(openBluetoothSettings);
             } else {
                 Toast.makeText(this, "Bluetooth turned off. Go to settings to turn on", Toast.LENGTH_SHORT).show();
             }
@@ -125,13 +129,19 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // Don't forget to unregister the ACTION_FOUND receiver.
-        unregisterReceiver(mReceiver);
+        //unregisterReceiver(mReceiver);
     }
 
-    private void displayBluetoothDeviceDialog(){
-        mBluetoothFragment = new BluetoothFragment();
-        DialogFragment dialog = mBluetoothFragment;
-        dialog.show(getSupportFragmentManager(), "bluetooth_device_dialog");
+//    private void displayBluetoothDeviceDialog(){
+//        mBluetoothFragment = new BluetoothFragment();
+//        DialogFragment dialog = mBluetoothFragment;
+//        dialog.show(getSupportFragmentManager(), "bluetooth_device_dialog");
+//    }
+
+    public BluetoothDevice connectAddress(String address){
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+
+     return device;
     }
 
 }

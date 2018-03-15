@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cpen391.healthwatch.bluetooth.BluetoothActivity;
-import com.cpen391.healthwatch.bluetooth.BluetoothFragment;
+//import com.cpen391.healthwatch.bluetooth.BluetoothFragment;
 import com.cpen391.healthwatch.bluetooth.BluetoothService;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,10 +30,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showDialog() {
-        DialogFragment newFragment = new BluetoothFragment();
-        newFragment.show(getSupportFragmentManager(), "missiles");
-    }
+//    public void showDialog() {
+//        DialogFragment newFragment = new BluetoothFragment();
+//        newFragment.show(getSupportFragmentManager(), "missiles");
+//    }
 
 
     private void startBluetooth(){
