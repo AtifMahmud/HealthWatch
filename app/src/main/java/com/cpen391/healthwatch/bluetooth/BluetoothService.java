@@ -16,19 +16,12 @@ package com.cpen391.healthwatch.bluetooth;
 
 
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import static android.support.v4.app.ActivityCompat.startActivityForResult;
-
-
 public class BluetoothService extends Service {
-
-    private static final int BLUETOOTH_PERMISSION = 1;
-
 
     public BluetoothService() {
 
