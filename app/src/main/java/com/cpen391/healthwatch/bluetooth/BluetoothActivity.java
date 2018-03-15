@@ -15,7 +15,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
     private static final int REQUEST_BLUETOOTH = 1;
     private static final int REQUEST_COARSE_LOCATION = 2;
-    private BluetoothAdapter mBluetoothAdapter;
+    public static BluetoothAdapter mBluetoothAdapter;
 
 
     @Override
@@ -25,7 +25,7 @@ public class BluetoothActivity extends AppCompatActivity {
         checkLocationPermission();
     }
 
-    
+
     // Prompts user to enable location permission if not enabled. Otherwise, sets bluetooth up
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
