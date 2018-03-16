@@ -44,4 +44,12 @@ public interface MapInterface {
      * @param enabled true to enable, false to disable.
      */
     void setMyLocationEnabled(boolean enabled);
+
+    /**
+     * Animate camerat to a given latitude and longitude on the map.
+     * @param lat latitude.
+     * @param lng longitude.
+     * @param zoom the level of the zoom, a value of 15 shows roads, higher means zoom out further.
+     */
+    void animateCamera(double lat, double lng, float zoom);
 }

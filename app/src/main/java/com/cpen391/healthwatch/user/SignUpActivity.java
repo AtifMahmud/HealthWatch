@@ -7,11 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
-import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.util.GlobalFactory;
@@ -28,7 +28,7 @@ import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
  *
  */
 public class SignUpActivity extends Activity
-    implements ServerErrorCallback {
+    implements ServerCallback, ServerErrorCallback {
     private final String TAG = SignUpActivity.class.getSimpleName();
 
     private EditText mUsernameText;
@@ -36,11 +36,14 @@ public class SignUpActivity extends Activity
     private EditText mConfirmPasswordText;
     private CircularProgressButton mSignUpButton;
 
+    private String mUsername;
+    private String mPassword;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_signup);
+
         obtainViews();
         setListeners();
     }
@@ -50,6 +53,13 @@ public class SignUpActivity extends Activity
             @Override
             public void onClick(View view) {
                 signUp();
+            }
+        });
+        TextView loginLink = findViewById(R.id.link_login);
+        loginLink.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }
@@ -105,12 +115,7 @@ public class SignUpActivity extends Activity
             mSignUpButton.startAnimation();
 
             String body = obtainUserJSONString();
-            GlobalFactory.getServerInterface().asyncPost("/gateway/auth/user", null, body, new ServerCallback() {
-                @Override
-                public void onSuccessResponse(String response) {
-                    onSignUpSuccess();
-                }
-            }, this);
+            GlobalFactory.getServerInterface().asyncPost("/gateway/auth/user", null, body, this, this);
         }
     }
 
@@ -128,10 +133,12 @@ public class SignUpActivity extends Activity
 
     private String obtainUserJSONString() {
         try {
+            mUsername = mUsernameText.getText().toString();
+            mPassword = mPasswordText.getText().toString();
             return new JSONObject()
             .put("user", new JSONObject()
-                    .put("username", mUsernameText.getText().toString())
-                    .put("password", mPasswordText.getText().toString()))
+                    .put("username", mUsername)
+                    .put("password", mPassword))
                     .toString();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -139,15 +146,20 @@ public class SignUpActivity extends Activity
         return "{}";
     }
 
-    private void onSignUpSuccess() {
-        Intent patientPageIntent = new Intent(this, PatientActivity.class);
-        startActivity(patientPageIntent);
-        finish();
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         mSignUpButton.dispose();
+    }
+
+    @Override
+    public void onSuccessResponse(String response) {
+        Intent data = new Intent();
+        Bundle extras = new Bundle();
+        extras.putString("username", mUsername);
+        extras.putString("password", mPassword);
+        data.putExtras(extras);
+        setResult(RESULT_OK, data);
+        finish();
     }
 }

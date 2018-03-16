@@ -11,13 +11,11 @@
 package com.cpen391.healthwatch.patient;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.widget.TextView;
 
 import com.cpen391.healthwatch.R;
+import com.cpen391.healthwatch.util.GlobalFactory;
 
 public class PatientActivity extends AppCompatActivity {
 
@@ -25,5 +23,8 @@ public class PatientActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient);
+
+        TextView nameText = findViewById(R.id.user_profile_name);
+        nameText.setText(GlobalFactory.getUserSessionInterface().getUsername());
     }
 }

@@ -2,6 +2,8 @@ package com.cpen391.healthwatch.map.implementation;
 
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -59,5 +61,12 @@ public class CustomGoogleMap implements MapInterface {
     @Override
     public void setMyLocationEnabled(boolean enabled) throws SecurityException {
         mMap.setMyLocationEnabled(enabled);
+    }
+
+    @Override
+    public void animateCamera(double lat, double lng, float zoom) {
+        LatLng coordinate = new LatLng(lat, lng);
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(coordinate, zoom);
+        mMap.animateCamera(location);
     }
 }
