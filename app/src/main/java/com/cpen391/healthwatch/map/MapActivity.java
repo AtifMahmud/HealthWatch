@@ -26,13 +26,20 @@
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.cpen391.healthwatch.R;
@@ -42,6 +49,7 @@ import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
 import com.cpen391.healthwatch.map.implementation.CustomGoogleMap;
 import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
+import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -62,6 +70,7 @@ public class MapActivity extends FragmentActivity implements
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
+    private LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +83,18 @@ public class MapActivity extends FragmentActivity implements
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 initMapInterface(new CustomGoogleMap(googleMap));
+            }
+        });
+        setListeners();
+    }
+
+    private void setListeners() {
+        FloatingActionButton actionButton = findViewById(R.id.btn_profile);
+        actionButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapActivity.this, PatientActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -91,7 +112,12 @@ public class MapActivity extends FragmentActivity implements
         mMap.setMaxZoomPreference(MAX_ZOOM_LEVEL);
         enableLocationServices();
         mCurrentIcons = new ArrayList<>();
-        setMapListeners();
+        mMap.setOnCameraIdleListener(new OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                checkToUpdateMarkers();
+            }
+        });
 
         JSONArray locationsArray = genTestLocations();
 
@@ -103,15 +129,12 @@ public class MapActivity extends FragmentActivity implements
                 e.printStackTrace();
             }
         }
-    }
 
-    private void setMapListeners() {
-        mMap.setOnCameraIdleListener(new OnCameraIdleListener() {
-            @Override
-            public void onCameraIdle() {
-                checkToUpdateMarkers();
-            }
-        });
+        Location loc = getLastBestLocation();
+        if (loc != null) {
+            final int ZOOM_LEVEL = 15;
+            mMap.animateCamera(loc.getLatitude(), loc.getLongitude(), ZOOM_LEVEL);
+        }
     }
 
     private void checkToUpdateMarkers() {
@@ -125,10 +148,37 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * @return the best last known location of the user.
+     */
+    private Location getLastBestLocation() {
+        if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            long GPSLocationTime = 0;
+            if (null != locationGPS) {
+                GPSLocationTime = locationGPS.getTime();
+            }
+            long NetLocationTime = 0;
+            if (null != locationNet) {
+                NetLocationTime = locationNet.getTime();
+            }
+            if (0 < GPSLocationTime - NetLocationTime) {
+                return locationGPS;
+            } else {
+                return locationNet;
+            }
+        }
+        return null;
+    }
+
     private void enableLocationServices() {
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION);

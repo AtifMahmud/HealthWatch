@@ -39,4 +39,9 @@ public class StubMap implements MapInterface {
     public void setMyLocationEnabled(boolean enabled) {
 
     }
+
+    @Override
+    public void animateCamera(double lat, double lng, float zoom) {
+
+    }
 }
