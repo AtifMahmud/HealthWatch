@@ -29,7 +29,9 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.google.maps.android:android-maps-utils:0.3.4'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.1'
+
+    implementation 'com.google.maps.android:android-maps-utils:0.3.4'
     testCompile 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.7.1"
     implementation 'com.google.android.gms:play-services-maps:11.8.0'

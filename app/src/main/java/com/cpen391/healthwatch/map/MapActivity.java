@@ -30,7 +30,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -131,14 +130,11 @@ public class MapActivity extends FragmentActivity implements
             }
         }
 
-        double lat = 49.246292;
-        double lng = -123.116226;
         Location loc = getLastBestLocation();
         if (loc != null) {
-            lat = loc.getLatitude();
-            lng = loc.getLongitude();
+            final int ZOOM_LEVEL = 15;
+            mMap.animateCamera(loc.getLatitude(), loc.getLongitude(), ZOOM_LEVEL);
         }
-        mMap.animateCamera(lat, lng, 15);
     }
 
     private void checkToUpdateMarkers() {
@@ -153,7 +149,7 @@ public class MapActivity extends FragmentActivity implements
     }
 
     /**
-     * @return the last know best location
+     * @return the best last known location of the user.
      */
     private Location getLastBestLocation() {
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
@@ -183,11 +179,6 @@ public class MapActivity extends FragmentActivity implements
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            LocationListener locationListener = new CustomLocationListener();
-            if (mLocationManager != null) {
-                mLocationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-            }
         } else {
             ActivityCompat.requestPermissions(this, new String[]{permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION);

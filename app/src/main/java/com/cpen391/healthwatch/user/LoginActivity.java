@@ -28,9 +28,8 @@ import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
  * Created by william on 2018/3/12.
  *
  */
-
 public class LoginActivity extends Activity
-    implements ServerCallback, ServerErrorCallback {
+        implements ServerCallback, ServerErrorCallback {
     private String TAG = LoginActivity.class.getSimpleName();
     private static final int REQUEST_SIGN_UP = 0;
 
@@ -76,22 +75,54 @@ public class LoginActivity extends Activity
         mLoginButton.setEnabled(false);
         mLoginButton.startAnimation();
 
-        String body = obtainCredentialsJSONString();
+        String body = validate();
+        if (body == null) {
+            mLoginButton.revertAnimation();
+            mLoginButton.setEnabled(true);
+            return;
+        }
         GlobalFactory.getServerInterface().asyncPost("/gateway/auth/token", null,
                 body, this, this);
     }
 
     /**
+     * Validates the username and password that is inputted.
+     *
+     * @return the json object to send to the server if everything is entered correctly,
+     *  or null if something was not entered correctly.
+     */
+    private String validate() {
+        String username = mUsernameText.getText().toString();
+        String password = mPasswordText.getText().toString();
+        boolean error = false;
+        if ("".equals(username)) {
+            mUsernameText.setError("Username not entered");
+            error = true;
+        }
+        if ("".equals(password)) {
+            mPasswordText.setError("Password not entered");
+            error = true;
+        }
+        if (error) {
+            return null;
+        }
+        return obtainCredentialsJSONString(username, password);
+
+    }
+
+    /**
      * Obtain the credentials json object required to log user in on server.
      *
+     * @param username username of user.
+     * @param password plaintext password of user.
      * @return the credentials json object as a string.
      */
-    private String obtainCredentialsJSONString() {
+    private String obtainCredentialsJSONString(String username, String password) {
         try {
             return new JSONObject()
                     .put("credentials", new JSONObject()
-                    .put("username", mUsernameText.getText().toString())
-                    .put("password", mPasswordText.getText().toString())
+                            .put("username", username)
+                            .put("password", password)
                     ).toString();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -123,11 +154,12 @@ public class LoginActivity extends Activity
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        switch(error.networkResponse.statusCode) {
+        switch (error.networkResponse.statusCode) {
             case 401:
                 showLoginError();
                 break;
-            default: Toast.makeText(getApplicationContext(), "Sorry, Bad Request", Toast.LENGTH_SHORT).show();
+            default:
+                Toast.makeText(getApplicationContext(), "Sorry, Bad Request", Toast.LENGTH_SHORT).show();
         }
         mLoginButton.revertAnimation();
         mLoginButton.setEnabled(true);

@@ -1,5 +1,6 @@
 package com.cpen391.healthwatch;
 
+import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerInterface;
+import com.cpen391.healthwatch.user.LoginActivity;
 import com.cpen391.healthwatch.user.SignUpActivity;
 import com.cpen391.healthwatch.util.GlobalFactory;
 
@@ -15,79 +17,73 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowIntent;
 
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robolectric.Shadows.shadowOf;
 
 /**
- * Created by william on 2018/3/9.
+ * Created by william on 2018/3/16.
  *
  */
 @RunWith(RobolectricTestRunner.class)
-public class SignUpActivityTest {
-    private SignUpActivity mActivity;
+public class LoginActivityTest {
+    private LoginActivity mActivity;
     private ServerInterface mMockServer = mock(ServerInterface.class);
 
     private EditText mUsernameText;
     private EditText mPasswordText;
-    private EditText mConfirmPasswordText;
-    private Button mSignUpButton;
-    private TextView mLoginLink;
+    private Button mLoginButton;
+    private TextView mSignUpLink;
 
     @Before
     public void setUp() throws Exception {
-        mActivity = Robolectric.buildActivity(SignUpActivity.class)
+        mActivity = Robolectric.buildActivity(LoginActivity.class)
                 .create()
                 .start()
                 .resume()
                 .get();
         mUsernameText = mActivity.findViewById(R.id.input_username);
         mPasswordText = mActivity.findViewById(R.id.input_password);
-        mConfirmPasswordText = mActivity.findViewById(R.id.input_password_confirm);
-        mSignUpButton = mActivity.findViewById(R.id.btn_sign_up);
-        mLoginLink = mActivity.findViewById(R.id.link_login);
+        mLoginButton = mActivity.findViewById(R.id.btn_login);
+        mSignUpLink = mActivity.findViewById(R.id.link_sign_up);
         GlobalFactory.setServerInterface(mMockServer);
     }
 
     @Test
-    public void testSignUpEmptyFields() {
-        mSignUpButton.performClick();
+    public void testLoginEmptyFields() {
+        mLoginButton.performClick();
         assertNotNull(mUsernameText.getError());
         assertNotNull(mPasswordText.getError());
-    }
-
-    @Test
-    public void testNotSamePassword() {
-        // Assert error if password and confirm password is not the same.
-        String testPassword = "12345678";
-        String wrongPassword = "87654321";
-        mPasswordText.setText(testPassword);
-        mConfirmPasswordText.setText(wrongPassword);
-        mSignUpButton.performClick();
-        assertNotNull(mConfirmPasswordText.getError());
-    }
-
-    @Test
-    public void testCorrectSignUp() {
-        String username = "testUser";
-        String password = "12345678";
-        mUsernameText.setText(username);
-        mPasswordText.setText(password);
-        mConfirmPasswordText.setText(password);
-        mSignUpButton.performClick();
-        verify(mMockServer).asyncPost(eq("/gateway/auth/user"), anyMapOf(String.class, String.class), anyString(),
+        verify(mMockServer, times(0)).asyncPost(eq("/gateway/auth/token"), anyMapOf(String.class, String.class), anyString(),
                 any(ServerCallback.class), any(ServerErrorCallback.class));
     }
 
     @Test
-    public void testLoginLink_shouldFinishActivity() {
-        mLoginLink.performClick();
-        assertTrue(mActivity.isFinishing());
+    public void testLoginWithCorrectFields() {
+        mUsernameText.setText("TestUser");
+        mPasswordText.setText("12345678");
+        mLoginButton.performClick();
+        verify(mMockServer).asyncPost(eq("/gateway/auth/token"), anyMapOf(String.class, String.class), anyString(),
+                any(ServerCallback.class), any(ServerErrorCallback.class));
+    }
+
+    @Test
+    public void testSignUpLink_shouldStartSignUpActivity() {
+        mSignUpLink.performClick();
+        ShadowActivity shadowActivity = shadowOf(mActivity);
+        Intent intent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = shadowOf(intent);
+        assertThat(shadowIntent.getIntentClass().getName(), equalTo(SignUpActivity.class.getName()));
     }
 }
