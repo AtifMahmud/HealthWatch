@@ -1,5 +1,8 @@
 package com.cpen391.healthwatch.server.abstraction;
 
+import com.cpen391.healthwatch.server.implementation.MultipartRequest.DataPart;
+
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -32,6 +35,16 @@ public interface ServerInterface {
      * @param callback callback to invoke on success.
      */
     void asyncPost(String path, String body, ServerCallback callback);
+
+    /**
+     * Makes a Post request with form data.
+     *
+     * @param path the path to make the request.
+     * @param dataParts the files to send in the form.
+     * @param callback the callback to invoke on success.
+     * @param errorCallback the callback to invoke on error.
+     */
+    void asyncPost(String path, List<DataPart> dataParts, ServerCallback callback, ServerErrorCallback errorCallback);
 
     /**
      * Makes a GET request.

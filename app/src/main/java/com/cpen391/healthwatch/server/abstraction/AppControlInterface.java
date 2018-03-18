@@ -1,6 +1,7 @@
 package com.cpen391.healthwatch.server.abstraction;
 
 import com.android.volley.Request;
+import com.android.volley.toolbox.ImageLoader;
 
 /**
  * Created by william on 2018/3/6.
@@ -14,4 +15,10 @@ public interface AppControlInterface {
      * @param <T> the type of the request.
      */
     <T> void addToRequestQueue(Request<T> req);
+
+    /**
+     *
+     * @return the image loader used for image caching purposes.
+     */
+    ImageLoader getImageLoader();
 }
