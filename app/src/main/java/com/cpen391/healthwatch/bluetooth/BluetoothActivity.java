@@ -2,27 +2,60 @@ package com.cpen391.healthwatch.bluetooth;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 import com.cpen391.healthwatch.R;
+import java.util.Set;
+
+import static android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED;
 
 public class BluetoothActivity extends AppCompatActivity {
 
+    private final String TAG = BluetoothActivity.class.getSimpleName();
     private static final int REQUEST_BLUETOOTH = 1;
     private static final int REQUEST_COARSE_LOCATION = 2;
-    public static BluetoothAdapter mBluetoothAdapter;
+    private static final int PAIRED = 3;
+    private static final String deviceName = "HealthWatch2";
+
+
+    public static BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+    private BroadcastReceiver mBroadcastReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, "action: " + action);
+            if (action != null) {
+                switch (action) {
+                    case BluetoothDevice.ACTION_ACL_CONNECTED:
+                            Toast.makeText(context, "Connected to  " + deviceName, Toast.LENGTH_SHORT).show();
+                            startBtService();
+                }
+            }
+        }
+    };
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        registerReceiver(mBroadcastReciever, filter);
         checkLocationPermission();
+
     }
 
 
@@ -41,7 +74,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
     // Responds to user action on location permission request
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (requestCode == REQUEST_COARSE_LOCATION) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -65,7 +98,11 @@ public class BluetoothActivity extends AppCompatActivity {
                 enableBluetooth();
             }
             else {
-                startBtService();
+                if (checkAvailable()) {
+                   startBtService();
+                } else {
+                    showBtSettings();
+                }
             }
         }
     }
@@ -83,11 +120,32 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == REQUEST_BLUETOOTH){
             if (resultCode == RESULT_OK){
-                startBtService();
-            } else{
+                Toast.makeText(this, "Bluetooth connected", Toast.LENGTH_SHORT).show();
+               if (checkAvailable()) {
+                   startBtService();
+               } else {
+                   showBtSettings();
+               }
+            } else {
                 Toast.makeText(this, "App needs bluetooth to run", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+
+    private boolean checkAvailable(){
+
+        Set<BluetoothDevice> bondedDevices = mBluetoothAdapter.getBondedDevices();
+        boolean found = false;
+
+        for (BluetoothDevice device : bondedDevices){
+            if(deviceName.equals(device.getName())){
+                found = true;
+            }
+        }
+
+        Log.d(TAG, "Found: " + found);
+        return found;
     }
 
 
@@ -98,10 +156,18 @@ public class BluetoothActivity extends AppCompatActivity {
     }
 
 
+    private void showBtSettings() {
+        Intent openBluetoothSettings = new Intent();
+        openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
+        startActivityForResult(openBluetoothSettings, PAIRED);
+        Toast.makeText(this, "Bluetooth Service running, please pair with " + deviceName, Toast.LENGTH_LONG).show();
+    }
+
+
     @Override
     protected void onDestroy() {
+        unregisterReceiver(mBroadcastReciever);
         super.onDestroy();
-
     }
 
 

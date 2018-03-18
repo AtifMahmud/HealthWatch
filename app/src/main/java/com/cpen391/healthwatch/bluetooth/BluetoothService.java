@@ -12,7 +12,6 @@ package com.cpen391.healthwatch.bluetooth;
  *      3. https://www.androidauthority.com/community/threads/trying-to-get-a-list-of-available-bluetooth-devices.25490/  --- ???
  *      4. https://developer.android.com/guide/topics/ui/dialogs.html
  *      5. https://stackoverflow.com/questions/22899475/android-sample-bluetooth-code-to-send-a-simple-string-via-bluetooth
- *
  */
 
 import android.app.Service;
@@ -21,7 +20,8 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.ParcelUuid;
-import android.provider.Settings;
+import android.util.Log;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,14 +30,28 @@ import java.util.Set;
 
 
 public class BluetoothService extends Service {
-
+    private final String TAG = BluetoothService.class.getSimpleName();
     private static final String CONNECTED = "android.bluetooth.device.action.ACL_CONNECTED";
-    private static final String deviceName = "Bose AE2 SoundLink";
-    private static final String message = "this is a message for healthwatch";
+    private static final String DEVICE_NAME = "HealthWatch2";
+    private static final String MESSAGE = "HELLO";
+
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    BluetoothDevice mBluetoothDevice;
+    Set<BluetoothDevice> bondedDevices;
+
+
     public BluetoothService() {
+
+    }
+
+    @Override
+    public void onCreate(){
+        bondedDevices = BluetoothActivity.mBluetoothAdapter.getBondedDevices();
+        setupComms();
+        // Either get the first bonded device, or get bonded device by name, and talk to it
+        //Toast.makeText(this, "In BTservice, oncreate", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -47,42 +61,27 @@ public class BluetoothService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    @Override
     public int onStartCommand (Intent intent, int flags, int startId) {
+       // Toast.makeText(this, "In BTservice, onstartcommand", Toast.LENGTH_SHORT).show();
 
-            Toast.makeText(this, "Bluetooth Service running, please connect to HealthWatch Device", Toast.LENGTH_LONG).show();
-            showBtSettings();
-
-
-            // We want this service to continue running until it is explicitly
-            // stopped, so return sticky.
-            return START_STICKY;
-    }
-
-
-    private void showBtSettings() {
-        Intent openBluetoothSettings = new Intent();
-        openBluetoothSettings.setAction(Settings.ACTION_BLUETOOTH_SETTINGS);
-        startActivity(openBluetoothSettings);
-        setupComms();
+        return START_NOT_STICKY;
     }
 
 
     private void setupComms(){
-
-        BluetoothDevice mBluetoothDevice;
-
-        // Either get the first bonded device, or get bonded device by name, and talk to it
-        Set<BluetoothDevice> bondedDevices = BluetoothActivity.mBluetoothAdapter.getBondedDevices();
-
+        Toast.makeText(this,"Trying to communicate", Toast.LENGTH_SHORT).show();
         for (BluetoothDevice device : bondedDevices) {
-
+            Toast.makeText(this, device.getName(), Toast.LENGTH_SHORT).show();
             mBluetoothDevice = device;
 
-            if (mBluetoothDevice.getName().equals(deviceName)) {
+            if (mBluetoothDevice.getName().equals(DEVICE_NAME)) {
+                Log.d(TAG, "DeviceName: " + mBluetoothDevice.getName());
+                Toast.makeText(this, mBluetoothDevice.getAddress(), Toast.LENGTH_SHORT).show();
                 try {
                     talkToDevice(mBluetoothDevice);
                 } catch (IOException e){
-                    Toast.makeText(this, "IO exception", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "IOException in setupCommns");
                 }
 
             }
@@ -91,10 +90,7 @@ public class BluetoothService extends Service {
 
 
     private void talkToDevice(BluetoothDevice device) throws IOException{
-
-        if (device.ACTION_ACL_CONNECTED.equals(CONNECTED)){
-            Toast.makeText(this, "HealthWatch is now connected to" + deviceName, Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(this, "In talkToDevice", Toast.LENGTH_SHORT).show();
             // talk to it
             ParcelUuid[] uuids = device.getUuids();
             BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
@@ -103,21 +99,18 @@ public class BluetoothService extends Service {
                 socket.connect();
                 outputStream = socket.getOutputStream();
                 inputStream = socket.getInputStream();
-                write(message);
+                write(MESSAGE);
 
             } catch (IOException e){
-                Toast.makeText(this, "IO exception", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "IOException in talkToDevice");
             }
-
-        } else {
-            Toast.makeText(this, "Please connect to " + deviceName, Toast.LENGTH_SHORT).show();
-        }
 
     }
 
 
     public void write(String s) throws IOException {
         Toast.makeText(this, "Writing bytes", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "writing to bluetooth");
         outputStream.write(s.getBytes());
     }
 
