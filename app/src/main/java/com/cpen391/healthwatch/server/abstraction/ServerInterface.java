@@ -40,11 +40,13 @@ public interface ServerInterface {
      * Makes a Post request with form data.
      *
      * @param path the path to make the request.
+     * @param headers the http headers.
      * @param dataParts the files to send in the form.
      * @param callback the callback to invoke on success.
      * @param errorCallback the callback to invoke on error.
      */
-    void asyncPost(String path, List<DataPart> dataParts, ServerCallback callback, ServerErrorCallback errorCallback);
+    void asyncPost(String path, Map<String, String> headers, List<DataPart> dataParts,
+                   ServerCallback callback, ServerErrorCallback errorCallback);
 
     /**
      * Makes a GET request.

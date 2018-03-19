@@ -34,10 +34,10 @@ public class ServerContact implements ServerInterface {
     }
 
     @Override
-    public void asyncPost(String path, List<DataPart> dataParts,
+    public void asyncPost(String path, Map<String, String> headers, List<DataPart> dataParts,
                           ServerCallback callback, ServerErrorCallback errorCallback) {
         String url = ServerInterface.BASE_URL + path;
-        MultipartRequest multipartRequest = new MultipartRequest(url, null, dataParts, callback, errorCallback);
+        MultipartRequest multipartRequest = new MultipartRequest(url, headers, dataParts, callback, errorCallback);
         mAppControl.addToRequestQueue(multipartRequest);
     }
 

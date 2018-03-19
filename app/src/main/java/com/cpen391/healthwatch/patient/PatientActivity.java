@@ -11,6 +11,7 @@
 package com.cpen391.healthwatch.patient;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,6 +32,7 @@ import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerInterface;
 import com.cpen391.healthwatch.util.BitmapDecodeTask;
+import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView.OnLoadCompleteListener;
 import com.cpen391.healthwatch.util.GlobalFactory;
@@ -79,6 +81,13 @@ public class PatientActivity extends AppCompatActivity {
                 uploadUserProfileImageButtonClick();
             }
         });
+        mProfileImage.setOnLoadCompleteListener(new OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete() {
+                Log.d(TAG, "Loading image complete");
+                mImageProgressSpinner.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void uploadUserProfileImageButtonClick() {
@@ -112,12 +121,6 @@ public class PatientActivity extends AppCompatActivity {
             String imageFilePath = new JSONObject(imageFilePathJson).getString("image");
             String url = ServerInterface.BASE_URL + "/gateway/user/image/" + imageFilePath;
             mProfileImage.setImageUrl(url, GlobalFactory.getAppControlInterface().getImageLoader());
-            mProfileImage.setOnLoadCompleteListener(new OnLoadCompleteListener() {
-                @Override
-                public void onLoadComplete() {
-                    mImageProgressSpinner.setVisibility(View.INVISIBLE);
-                }
-            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -155,28 +158,54 @@ public class PatientActivity extends AppCompatActivity {
         List<String> filePaths = new ArrayList<>();
         filePaths.add(mCurrentPhotoPath);
         mImageProgressSpinner.setVisibility(View.VISIBLE);
-        UploadImageTask uploadImageTask = new UploadImageTask("/gateway/user/image", "image",
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        Log.d(TAG, "uploading image");
+        UploadImageTask uploadImageTask = new UploadImageTask("/gateway/user/image", headers, "image",
                 filePaths, new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                mImageProgressSpinner.setVisibility(View.INVISIBLE);
-                File imageFile = new File(mCurrentPhotoPath);
-                if (imageFile.exists()) {
-                    if (!imageFile.delete()) {
-                        Log.d(TAG, "Unable to delete image file");
-                    }
-                }
-                BitmapDecodeTask bitmapDecodeTask = new BitmapDecodeTask(mProfileImage);
-                bitmapDecodeTask.execute(mCurrentPhotoPath);
+                onUserProfileImageUploaded();
             }
         }, new ServerErrorCallback() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 mImageProgressSpinner.setVisibility(View.INVISIBLE);
+                deleteCurrentPhoto();
                 Toast.makeText(getApplicationContext(), "Unable to upload image", Toast.LENGTH_SHORT).show();
             }
         });
         uploadImageTask.execute();
+    }
+
+    private void onUserProfileImageUploaded() {
+        Log.d(TAG, "decoding uploaded image");
+        BitmapDecodeTask bitmapDecodeTask = new BitmapDecodeTask(new ImageDecodeCallback() {
+            @Override
+            public void callback(Bitmap bitmap) {
+                mProfileImage.setLocalImageBitmap(bitmap);
+            }
+        });
+        bitmapDecodeTask.execute(mCurrentPhotoPath);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        deleteCurrentPhoto();
+    }
+
+    private void deleteCurrentPhoto() {
+        if (mCurrentPhotoPath != null) {
+            File imageFile = new File(mCurrentPhotoPath);
+            if (imageFile.exists()) {
+                if (!imageFile.delete()) {
+                    Log.d(TAG, "Unable to delete image file");
+                } else {
+                    Log.d(TAG, "Image deleted");
+                }
+            }
+        }
     }
 
     private File createImageFile() throws IOException {
@@ -184,6 +213,7 @@ public class PatientActivity extends AppCompatActivity {
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        deleteCurrentPhoto(); // Delete the previous stored photo if there was one.
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }

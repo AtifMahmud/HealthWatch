@@ -13,6 +13,7 @@ import com.cpen391.healthwatch.server.implementation.MultipartRequest.DataPart;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by william on 2018/1/25.
@@ -21,6 +22,7 @@ import java.util.List;
 public class UploadImageTask extends AsyncTask<String, Void, Void> {
     private String mDataName;
     private String mPath;
+    private Map<String, String> mHeaders;
     private List<String> mFilePaths;
     private ServerCallback mCallback;
     private ServerErrorCallback mErrorCallback;
@@ -28,15 +30,17 @@ public class UploadImageTask extends AsyncTask<String, Void, Void> {
     /**
      * Creates a task to upload images to the server.
      * @param path the path on the server to upload to.
+     * @param headers the http request headers.
      * @param dataName the name of the multipart data.
      * @param filepaths the file paths of the images to upload on the android device.
      * @param callback the callback to invoke on success.
      * @param errorCallback the callback to invoke on error.
      */
-    public UploadImageTask(String path, String dataName, List<String> filepaths,
+    public UploadImageTask(String path, Map<String, String> headers, String dataName, List<String> filepaths,
                            ServerCallback callback, ServerErrorCallback errorCallback) {
         mPath = path;
         mDataName = dataName;
+        mHeaders = headers;
         mFilePaths = filepaths;
         mCallback = callback;
         mErrorCallback = errorCallback;
@@ -54,7 +58,7 @@ public class UploadImageTask extends AsyncTask<String, Void, Void> {
             bitmap.compress(CompressFormat.JPEG, 70, bos);
             data.add(new DataPart(mDataName, filepath, bos.toByteArray(), "image/jpeg"));
         }
-        GlobalFactory.getServerInterface().asyncPost(mPath, data, mCallback, mErrorCallback);
+        GlobalFactory.getServerInterface().asyncPost(mPath, mHeaders, data, mCallback, mErrorCallback);
         return null;
     }
 }

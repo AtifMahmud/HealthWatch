@@ -3,9 +3,6 @@ package com.cpen391.healthwatch.util;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.widget.ImageView;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Created by william on 2018/1/1.
@@ -13,10 +10,13 @@ import java.lang.ref.WeakReference;
  */
 
 public class BitmapDecodeTask extends AsyncTask<String, Void, Bitmap> {
-    private final WeakReference<ImageView> mImageViewReference;
+    public interface ImageDecodeCallback {
+        void callback(Bitmap bitmap);
+    }
+    private ImageDecodeCallback mCallback;
 
-    public BitmapDecodeTask(ImageView imageView) {
-        mImageViewReference = new WeakReference<>(imageView);
+    public BitmapDecodeTask(ImageDecodeCallback callback) {
+        mCallback = callback;
     }
 
     @Override
@@ -28,10 +28,7 @@ public class BitmapDecodeTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if (bitmap != null) {
-            final ImageView imageView = mImageViewReference.get();
-            if (imageView != null) {
-                imageView.setImageBitmap(bitmap);
-            }
+            mCallback.callback(bitmap);
         }
     }
 }
