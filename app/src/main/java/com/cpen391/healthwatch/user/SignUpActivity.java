@@ -3,9 +3,13 @@ package com.cpen391.healthwatch.user;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +39,9 @@ public class SignUpActivity extends Activity
     private EditText mPasswordText;
     private EditText mConfirmPasswordText;
     private CircularProgressButton mSignUpButton;
+    private CheckBox mCaretakerCheckbox;
+    private TextInputLayout mCaretakerKeyTextLayout;
+    private EditText mCaretakerKeyText;
 
     private String mUsername;
     private String mPassword;
@@ -62,6 +69,16 @@ public class SignUpActivity extends Activity
                 finish();
             }
         });
+        mCaretakerCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    mCaretakerKeyTextLayout.setVisibility(View.VISIBLE);
+                } else {
+                    mCaretakerKeyTextLayout.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     private void obtainViews() {
@@ -69,6 +86,9 @@ public class SignUpActivity extends Activity
         mPasswordText = findViewById(R.id.input_password);
         mConfirmPasswordText = findViewById(R.id.input_password_confirm);
         mSignUpButton = findViewById(R.id.btn_sign_up);
+        mCaretakerCheckbox = findViewById(R.id.caretaker_checkbox);
+        mCaretakerKeyTextLayout = findViewById(R.id.input_caretaker_key_txt_layout);
+        mCaretakerKeyText = findViewById(R.id.input_caretaker_key);
     }
 
     /**
@@ -80,6 +100,7 @@ public class SignUpActivity extends Activity
         mUsernameText.setError(null);
         mPasswordText.setError(null);
         mConfirmPasswordText.setError(null);
+        mCaretakerKeyText.setError(null);
 
         boolean noError = true;
         final int MIN_USERNAME_LENGTH = 2;
@@ -88,6 +109,7 @@ public class SignUpActivity extends Activity
         String username = mUsernameText.getText().toString();
         String password = mPasswordText.getText().toString();
         String confirmPassword = mConfirmPasswordText.getText().toString();
+        boolean caretakerOptionChecked = mCaretakerCheckbox.isChecked();
 
         if (username.length() < MIN_USERNAME_LENGTH) {
             mUsernameText.setError(String.format(Locale.CANADA, "Username must be greater than %d letters", MIN_USERNAME_LENGTH));
@@ -104,6 +126,13 @@ public class SignUpActivity extends Activity
             noError = false;
         }
 
+        if (caretakerOptionChecked) {
+            String caretakerKey = mCaretakerKeyText.getText().toString();
+            if (caretakerKey.isEmpty()) {
+                mCaretakerKeyText.setError("Caretaker key not entered");
+                noError = false;
+            }
+        }
         return noError;
     }
 
@@ -115,15 +144,26 @@ public class SignUpActivity extends Activity
             mSignUpButton.startAnimation();
 
             String body = obtainUserJSONString();
-            GlobalFactory.getServerInterface().asyncPost("/gateway/auth/user", null, body, this, this);
+            GlobalFactory.getServerInterface()
+                    .asyncPost("/gateway/auth/user", null, body, this, this);
         }
     }
 
     public void onErrorResponse(VolleyError error) {
+        String usernameError = "Username exists";
+        String caretakerKeyError = "Caretaker key incorrect";
         switch(error.networkResponse.statusCode) {
             case 400: Toast.makeText(getApplicationContext(), "Bad Request", Toast.LENGTH_SHORT).show();
                 break;
-            case 403: Toast.makeText(getApplicationContext(), "Username exists", Toast.LENGTH_SHORT).show();
+            case 403:
+                String response = new String(error.networkResponse.data);
+                if (usernameError.equals(response)) {
+                    Toast.makeText(getApplicationContext(), usernameError, Toast.LENGTH_SHORT).show();
+                    mUsernameText.setError(usernameError);
+                } else {
+                    Toast.makeText(getApplicationContext(), caretakerKeyError, Toast.LENGTH_SHORT).show();
+                    mCaretakerKeyText.setError(caretakerKeyError);
+                }
                 break;
             default: Toast.makeText(getApplicationContext(), "Cannot Connect", Toast.LENGTH_SHORT).show();
         }
@@ -135,10 +175,14 @@ public class SignUpActivity extends Activity
         try {
             mUsername = mUsernameText.getText().toString();
             mPassword = mPasswordText.getText().toString();
-            return new JSONObject()
-            .put("user", new JSONObject()
+            JSONObject userJSON = new JSONObject()
                     .put("username", mUsername)
-                    .put("password", mPassword))
+                    .put("password", mPassword);
+            if (mCaretakerCheckbox.isChecked()) {
+                userJSON.put("carekey", mCaretakerKeyText.getText().toString());
+            }
+            return new JSONObject()
+            .put("user", userJSON)
                     .toString();
         } catch (JSONException e) {
             e.printStackTrace();

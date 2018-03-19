@@ -4,5 +4,5 @@
         android:drawable="@color/colorPrimaryDark"/>
     <item
         android:gravity="center"
-        android:drawable="@drawable/circle"/>
+        android:drawable="@drawable/logo"/>
 </layer-list>

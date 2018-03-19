@@ -19,7 +19,7 @@
             android:layout_height="72dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/circle"
+            android:src="@drawable/logo"
             android:contentDescription="@string/login_logo_image_desc"/>
 
         <!-- Email Label -->
@@ -60,6 +60,7 @@
             android:layout_gravity="center"
             android:background="@drawable/circular_border_shape"
             android:text="@string/login"
+            android:layout_marginTop="8dp"
             app:initialCornerAngle="50dp"
             app:spinning_bar_color="#FFF"
             app:spinning_bar_padding="6dp"

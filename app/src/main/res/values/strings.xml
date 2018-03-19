@@ -16,4 +16,7 @@
 
     <string name="preference_file_key">com.cpen391.healthwatch.PREFERENCE_FILE_KEY</string>
     <string name="login_token">login.token</string>
+
+    <string name="sign_up_user_type_option">Register as caretaker</string>
+    <string name="caretaker_key">Caretaker Key</string>
 </resources>
