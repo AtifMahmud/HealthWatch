@@ -150,19 +150,19 @@ public class SignUpActivity extends Activity
     }
 
     public void onErrorResponse(VolleyError error) {
-        String usernameError = "Username exists";
-        String caretakerKeyError = "Caretaker key incorrect";
+        String usernameError = "USERNAME_ERR";
+        String caretakerKeyError = "CAREKEY_ERR";
         switch(error.networkResponse.statusCode) {
             case 400: Toast.makeText(getApplicationContext(), "Bad Request", Toast.LENGTH_SHORT).show();
                 break;
             case 403:
                 String response = new String(error.networkResponse.data);
-                if (usernameError.equals(response)) {
-                    Toast.makeText(getApplicationContext(), usernameError, Toast.LENGTH_SHORT).show();
-                    mUsernameText.setError(usernameError);
-                } else {
-                    Toast.makeText(getApplicationContext(), caretakerKeyError, Toast.LENGTH_SHORT).show();
+                if (caretakerKeyError.equals(response)) {
+                    Toast.makeText(getApplicationContext(), "Caretaker key incorrect", Toast.LENGTH_SHORT).show();
                     mCaretakerKeyText.setError(caretakerKeyError);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Username exist", Toast.LENGTH_SHORT).show();
+                    mUsernameText.setError(usernameError);
                 }
                 break;
             default: Toast.makeText(getApplicationContext(), "Cannot Connect", Toast.LENGTH_SHORT).show();
