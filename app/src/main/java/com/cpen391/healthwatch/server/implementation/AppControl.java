@@ -1,11 +1,15 @@
 package com.cpen391.healthwatch.server.implementation;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.android.volley.toolbox.Volley;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.server.abstraction.AppControlInterface;
@@ -37,6 +41,7 @@ public class AppControl implements AppControlInterface {
     private static final String TAG = "AppControl";
 
     private final RequestQueue mRequestQueue;
+    private ImageLoader mImageLoader;
 
     /**
      * Constructs an application control object that uses SSL to connect to servers.
@@ -46,6 +51,17 @@ public class AppControl implements AppControlInterface {
         SSLSocketFactory sslSocketFactory = getSSLSocketFactory(context);
         HurlStack hurlStack = getHurlStack(sslSocketFactory);
         mRequestQueue = Volley.newRequestQueue(context, hurlStack);
+        mImageLoader = new ImageLoader(mRequestQueue, new ImageCache() {
+            private final LruCache<String, Bitmap> mCache = new LruCache<>(10);
+            @Override
+            public Bitmap getBitmap(String url) {
+                return mCache.get(url);
+            }
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+                mCache.put(url, bitmap);
+            }
+        });
     }
 
     private HurlStack getHurlStack(final SSLSocketFactory sslSocketFactory) {
@@ -109,5 +125,10 @@ public class AppControl implements AppControlInterface {
         req.setTag(TAG);
 
         mRequestQueue.add(req);
+    }
+
+    @Override
+    public ImageLoader getImageLoader() {
+        return mImageLoader;
     }
 }

@@ -42,9 +42,11 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String token = sharedPref.getString(getString(R.string.login_token), "");
         if (!token.isEmpty()) {
+            Log.d(TAG, "Token: " + token);
             // Should check token is valid, here, leaving for later.
             GlobalFactory.getUserSessionInterface().setUserToken(this, token);
             Log.d(TAG, "username: " + GlobalFactory.getUserSessionInterface().getUsername());
+            Log.d(TAG, "user type: " + GlobalFactory.getUserSessionInterface().getUserType());
         }
         return !token.isEmpty();
     }

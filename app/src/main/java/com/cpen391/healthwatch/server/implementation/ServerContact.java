@@ -5,7 +5,9 @@ import com.cpen391.healthwatch.server.abstraction.AppControlInterface;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerInterface;
+import com.cpen391.healthwatch.server.implementation.MultipartRequest.DataPart;
 
+import java.util.List;
 import java.util.Map;
 
 public class ServerContact implements ServerInterface {
@@ -29,6 +31,14 @@ public class ServerContact implements ServerInterface {
     @Override
     public void asyncPost(String path, String body, ServerCallback callback) {
         asyncPost(path, null, body, callback, null);
+    }
+
+    @Override
+    public void asyncPost(String path, Map<String, String> headers, List<DataPart> dataParts,
+                          ServerCallback callback, ServerErrorCallback errorCallback) {
+        String url = ServerInterface.BASE_URL + path;
+        MultipartRequest multipartRequest = new MultipartRequest(url, headers, dataParts, callback, errorCallback);
+        mAppControl.addToRequestQueue(multipartRequest);
     }
 
     @Override

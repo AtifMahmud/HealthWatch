@@ -29,10 +29,9 @@ import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 
 /**
  * Created by william on 2018/3/8.
- *
  */
 public class SignUpActivity extends Activity
-    implements ServerCallback, ServerErrorCallback {
+        implements ServerCallback, ServerErrorCallback {
     private final String TAG = SignUpActivity.class.getSimpleName();
 
     private EditText mUsernameText;
@@ -144,28 +143,32 @@ public class SignUpActivity extends Activity
             mSignUpButton.startAnimation();
 
             String body = obtainUserJSONString();
+            Log.d(TAG, "Signing up with: " + body);
             GlobalFactory.getServerInterface()
                     .asyncPost("/gateway/auth/user", null, body, this, this);
         }
     }
 
     public void onErrorResponse(VolleyError error) {
-        String usernameError = "USERNAME_ERR";
-        String caretakerKeyError = "CAREKEY_ERR";
-        switch(error.networkResponse.statusCode) {
-            case 400: Toast.makeText(getApplicationContext(), "Bad Request", Toast.LENGTH_SHORT).show();
-                break;
-            case 403:
-                String response = new String(error.networkResponse.data);
-                if (caretakerKeyError.equals(response)) {
-                    Toast.makeText(getApplicationContext(), "Caretaker key incorrect", Toast.LENGTH_SHORT).show();
-                    mCaretakerKeyText.setError(caretakerKeyError);
-                } else {
+        if (error.networkResponse == null) {
+            Log.d(TAG, "Error with network response");
+            Toast.makeText(getApplicationContext(), "Cannot Connect", Toast.LENGTH_SHORT).show();
+        } else {
+            switch (error.networkResponse.statusCode) {
+                case 400:
+                    Toast.makeText(getApplicationContext(), "Bad Request", Toast.LENGTH_SHORT).show();
+                    break;
+                case 403:
                     Toast.makeText(getApplicationContext(), "Username exist", Toast.LENGTH_SHORT).show();
-                    mUsernameText.setError(usernameError);
-                }
-                break;
-            default: Toast.makeText(getApplicationContext(), "Cannot Connect", Toast.LENGTH_SHORT).show();
+                    mUsernameText.setError("Username exist");
+                    break;
+                case 406:
+                    Toast.makeText(getApplicationContext(), "Caretaker key incorrect", Toast.LENGTH_SHORT).show();
+                    mCaretakerKeyText.setError("Caretaker key incorrect");
+                    break;
+                default:
+                    Toast.makeText(getApplicationContext(), "Cannot Connect", Toast.LENGTH_SHORT).show();
+            }
         }
         mSignUpButton.revertAnimation();
         mSignUpButton.setEnabled(true);
@@ -182,7 +185,7 @@ public class SignUpActivity extends Activity
                 userJSON.put("carekey", mCaretakerKeyText.getText().toString());
             }
             return new JSONObject()
-            .put("user", userJSON)
+                    .put("user", userJSON)
                     .toString();
         } catch (JSONException e) {
             e.printStackTrace();
