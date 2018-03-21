@@ -117,8 +117,8 @@ public class MapActivity extends FragmentActivity implements
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         stopLocationUpdates();
     }
 
