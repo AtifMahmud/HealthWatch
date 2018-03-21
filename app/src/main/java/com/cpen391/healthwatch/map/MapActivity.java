@@ -111,8 +111,8 @@ public class MapActivity extends FragmentActivity implements
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         startLocationUpdates();
     }
 
