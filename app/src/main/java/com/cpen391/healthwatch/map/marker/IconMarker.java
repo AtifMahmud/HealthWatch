@@ -16,23 +16,27 @@ public class IconMarker {
     private final LatLng mPosition;
     private String mMarkerId;
     private String mType;
+    private String mPlace;
     private MarkerInterface mMarker;
 
-    private IconMarker(String markerId, LatLng position, String type) {
+    private IconMarker(String markerId, LatLng position, String type, String place) {
         mMarkerId = markerId;
         mPosition = position;
         mType = type;
+        mPlace = place;
     }
 
     /**
-     * Makes an IconMarker and puts it onto the map.
+     * Makes an IconMarker.
      *
-     * @param mapInterface the map to put icon marker on.
+     * expect json: |
+     *  {"place": "string", "type": "string", "id": "string", "latitude": "double", "longitude": "double"}
+     *
      * @param jsonMarker the json object that represents the marker.
      * @return the newly created IconMarker or null if the jsonMarker does not properly
      *  represent an icon marker.
      */
-    public static IconMarker makeMarker(MapInterface mapInterface, JSONObject jsonMarker) {
+    public static IconMarker makeMarker(JSONObject jsonMarker) {
         try {
             String loc = jsonMarker.getString("place");
             String type = jsonMarker.getString("type");
@@ -41,14 +45,7 @@ public class IconMarker {
                 markerId = jsonMarker.getString("id");
             }
             LatLng location = new LatLng(jsonMarker.getDouble("latitude"), jsonMarker.getDouble("longitude"));
-            MarkerOptions options = new MarkerOptions()
-                    .position(location)
-                    .title(type + " in " + loc)
-                    .icon(CustomIcons.getIcon(type));
-            IconMarker iconMarker = new IconMarker(markerId, location, type);
-            iconMarker.mMarker = mapInterface.addMarker(options);
-
-            return iconMarker;
+            return new IconMarker(markerId, location, type, loc);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -68,6 +65,21 @@ public class IconMarker {
     }
 
     /**
+     * Add marker to map.
+     * @param map the map to place marker on.
+     */
+    public void addMarker(MapInterface map) {
+        MarkerOptions options = new MarkerOptions()
+                .position(mPosition)
+                .title(mPlace)
+                .icon(CustomIcons.getIcon(mType));
+        mMarker = map.addMarker(options);
+    }
+
+    /**
+     *
+     * Precondition: addMarker must be called before
+     *   so that marker is added to the map.
      *
      * @return the marker associated with this object.
      */
