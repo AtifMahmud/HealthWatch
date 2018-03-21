@@ -52,4 +52,5 @@ public interface MapInterface {
      * @param zoom the level of the zoom, a value of 15 shows roads, higher means zoom out further.
      */
     void animateCamera(double lat, double lng, float zoom);
+
 }

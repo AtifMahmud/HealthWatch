@@ -50,10 +50,13 @@ import com.cpen391.healthwatch.map.implementation.CustomGoogleMap;
 import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
+import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +64,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -71,6 +76,11 @@ public class MapActivity extends FragmentActivity implements
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
     private LocationManager mLocationManager;
+
+    // Timer to periodically pull user locations from the server.
+    private Timer mLocationRequestTimer;
+
+    private List<MarkerInterface> mUserMarkers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +96,75 @@ public class MapActivity extends FragmentActivity implements
             }
         });
         setListeners();
+        setPeriodicLocationPulling();
+        mUserMarkers = new ArrayList<>();
+    }
+
+    private void setPeriodicLocationPulling() {
+        mLocationRequestTimer = new Timer();
+        mLocationRequestTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getOtherUserLocations();
+            }
+        }, 0, 5000);
+    }
+
+    /**
+     * Get the location of other users and update it on the map.
+     */
+    private void getOtherUserLocations() {
+        GlobalFactory.getServerInterface().asyncGet("/gateway/patients/location", new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Obtained response: " + response);
+                updateOtherUserLocationsOnMap(response);
+            }
+        });
+    }
+
+    private void updateOtherUserLocationsOnMap(String response) {
+        try {
+            JSONArray userLocationArr = new JSONArray(response);
+            for (int i = 0; i < userLocationArr.length(); i++) {
+                JSONObject userLocationJSON = userLocationArr.getJSONObject(i);
+                updateSingleOtherUserOnMap(userLocationJSON);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateSingleOtherUserOnMap(JSONObject userLocationJSON) throws JSONException {
+        String username = userLocationJSON.getString("username");
+        JSONObject locationJSON = userLocationJSON.getJSONObject("location");
+        double lat = locationJSON.getDouble("lat");
+        double lng = locationJSON.getDouble("lng");
+        LatLng position = new LatLng(lat, lng);
+        MarkerInterface marker = userInMarkerList(username);
+        if (marker == null) {
+            marker = mMap.addMarker(new MarkerOptions().title(username).position(position));
+            mUserMarkers.add(marker);
+        } else {
+            MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
+                    .createMarkerTransitionAnimator(marker, position);
+            transitionAnimator.start();
+        }
+    }
+
+    private MarkerInterface userInMarkerList(String username) {
+        for (MarkerInterface marker : mUserMarkers) {
+            if (username.equals(marker.getTitle())) {
+                return marker;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mLocationRequestTimer.cancel();
     }
 
     private void setListeners() {
@@ -204,7 +283,7 @@ public class MapActivity extends FragmentActivity implements
 
     /**
      * Adds a marker onto the map.
-     *
+     * <p>
      * PreCondition: the map is setup, the input json object contains all the required fields.
      * PostCondition: a marker is added to the map.
      *
