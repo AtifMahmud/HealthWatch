@@ -108,11 +108,6 @@ public class MapActivity extends FragmentActivity implements
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setListeners();
         createLocationRequest();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         startLocationUpdates();
     }
 
