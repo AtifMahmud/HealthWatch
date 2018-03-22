@@ -26,12 +26,16 @@
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -43,6 +47,9 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.cpen391.healthwatch.R;
+import com.cpen391.healthwatch.bluetooth.BluetoothDialog;
+import com.cpen391.healthwatch.bluetooth.BluetoothDialog.OnClickDialogListener;
+import com.cpen391.healthwatch.bluetooth.BluetoothService;
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MapInterface.OnCameraIdleListener;
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
@@ -65,12 +72,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
-
     private static final String TAG = MapActivity.class.getSimpleName();
-    private final int REQUEST_LOCATION = 1;
+    private final int REQUEST_FINE_LOCATION = 1;
+    private final int REQUEST_ENABLE_BLUETOOTH = 2;
+    private final int REQUEST_BLUETOOTH_SETTINGS = 3;
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
@@ -78,6 +87,17 @@ public class MapActivity extends FragmentActivity implements
     // The last center camera point used to determine when to request map
     // icons from server again.
     private LatLng mLastCameraCenter;
+
+    private BluetoothAdapter mBluetoothAdapter;
+    private String mHealthWatchBTAddress;
+
+
+    private void saveBluetoothDevice(BluetoothDevice device) {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.healthwatch_bt_address), device.getAddress());
+        editor.apply();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +113,109 @@ public class MapActivity extends FragmentActivity implements
             }
         });
         setListeners();
+        setupBluetooth();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopBluetoothService();
+    }
+
+    private void setupBluetooth() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        checkPairBluetoothDevices();
+        // Set up bluetooth ensuring that it's enabled.
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        mHealthWatchBTAddress = sharedPref.getString(getString(R.string.healthwatch_bt_address), "");
+        if (mHealthWatchBTAddress.isEmpty()) {
+            // User never paired with a healthwatch device, we prompt them to connect.
+            BluetoothDialog dialog = new BluetoothDialog();
+            dialog.setListener(new OnClickDialogListener() {
+                @Override
+                public void onPositiveClick() {
+                    checkBluetooth();
+                }
+                @Override
+                public void onNegativeClick() {
+                    Toast.makeText(getApplicationContext(),
+                            "App will not connect with HealthWatch without bluetooth", Toast.LENGTH_SHORT).show();
+                }
+            });
+            dialog.show(getSupportFragmentManager(), "BluetoothDialog");
+        } else {
+            // Check to see if bluetooth is connected or not, and start to make connection with health watch.
+            checkBluetooth();
+        }
+    }
+
+    /**
+     * Check the list of paired bluetooth devices, trying to find the one for Health Watch and connecting
+     * to it.
+     */
+    private boolean checkPairBluetoothDevices() {
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice device : pairedDevices) {
+            if (getString(R.string.health_watch).equals(device.getName())) {
+                mHealthWatchBTAddress = device.getAddress();
+                saveBluetoothDevice(device);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
+            if (resultCode == RESULT_OK) {
+                connectToHealthWatch();
+            } else {
+                Toast.makeText(this, "Bluetooth is off, Healthwatch will not be paired",
+                        Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == REQUEST_BLUETOOTH_SETTINGS) {
+            if (checkPairBluetoothDevices()) {
+                Toast.makeText(this, "Bluetooth settings saved", Toast.LENGTH_SHORT).show();
+                connectToHealthWatch();
+            } else {
+                Toast.makeText(this, "Health Watch device not paired", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void connectToHealthWatch() {
+        Log.d(TAG, "Connecting to HealthWatch");
+        if (mHealthWatchBTAddress.isEmpty()) {
+            Toast.makeText(this, "Please pair with a HealthWatch device", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+            startActivityForResult(intent, REQUEST_BLUETOOTH_SETTINGS);
+        } else {
+            startBluetoothService();
+        }
+    }
+
+    private void startBluetoothService() {
+        Intent intent = new Intent(this, BluetoothService.class);
+        intent.putExtra(BluetoothService.BLUETOOTH_ADDRESS, mHealthWatchBTAddress);
+        startService(intent);
+    }
+
+    private void stopBluetoothService() {
+        Intent intent = new Intent(this, BluetoothService.class);
+        stopService(intent);
+    }
+
+    /**
+     * Check that bluetooth is enabled, enable it if not enabled, otherwise try connecting to HealthWatch device..
+     */
+    private void checkBluetooth() {
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
+        } else {
+            connectToHealthWatch();
+        }
     }
 
     private void setListeners() {
@@ -246,13 +369,13 @@ public class MapActivity extends FragmentActivity implements
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION);
+                    REQUEST_FINE_LOCATION);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_LOCATION) {
+        if (requestCode == REQUEST_FINE_LOCATION) {
             if (permissions.length == 1 &&
                     permissions[0].equals(permission.ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -268,9 +391,16 @@ public class MapActivity extends FragmentActivity implements
     }
 
     /**
+<<<<<<< HEAD
      * Convert the json object received from the server to the json object used to create the marker.
      *
      * @param serverIconJson the icon json object returned by the server.
+=======
+     * Adds a marker onto the map.
+     * <p>
+     * PreCondition: the map is setup, the input json object contains all the required fields.
+     * PostCondition: a marker is added to the map.
+>>>>>>> 00c525a8df42a7d0e0ebb1a7c83c2f1f33e2e29a
      *
      * @return the json object required to create the marker.
      */
