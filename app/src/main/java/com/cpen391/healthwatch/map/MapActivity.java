@@ -391,16 +391,10 @@ public class MapActivity extends FragmentActivity implements
     }
 
     /**
-<<<<<<< HEAD
      * Convert the json object received from the server to the json object used to create the marker.
      *
      * @param serverIconJson the icon json object returned by the server.
-=======
      * Adds a marker onto the map.
-     * <p>
-     * PreCondition: the map is setup, the input json object contains all the required fields.
-     * PostCondition: a marker is added to the map.
->>>>>>> 00c525a8df42a7d0e0ebb1a7c83c2f1f33e2e29a
      *
      * @return the json object required to create the marker.
      */
