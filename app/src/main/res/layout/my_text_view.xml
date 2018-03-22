@@ -39,6 +39,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="end"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:backgroundTint="@color/colorPrimaryLight"/>
 
             <Button
@@ -50,6 +51,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="false"
                 android:layout_gravity="end"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:backgroundTint="@color/colorPrimaryLight"/>
 
       </LinearLayout>

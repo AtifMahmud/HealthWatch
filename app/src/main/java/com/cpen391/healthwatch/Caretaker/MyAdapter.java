@@ -1,6 +1,7 @@
 package com.cpen391.healthwatch.Caretaker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.CardView;
@@ -55,8 +56,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 Toast.makeText(view.getContext(), "Pressed " + t.getText().toString(), Toast.LENGTH_SHORT).show();
+                startMealPlan(t);
+                // Need to pass in the name as context to the new activity
             }
         });
+
 
         return vh;
 
@@ -80,5 +84,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         return mDataset.length;
     }
 
+
+    private void startMealPlan(TextView t){
+
+        // The TextView will be parsed to use in the endpoint/post request and maybe in the GUI as a title "Set Meal Plan for person x"
+
+
+    }
 
 }

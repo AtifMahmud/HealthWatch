@@ -7,7 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-s
+    s
+
     <style name="SplashTheme" parent="AppTheme">
         <item name="android:windowBackground">@drawable/background_splash</item>
     </style>
@@ -21,5 +22,5 @@ s
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Theme.NoTitle" parent="@android:style/Theme.Holo.NoActionBar"/>
+    <style name="Theme.NoTitle" parent="@android:style/Theme.Holo.NoActionBar" />
 </resources>
