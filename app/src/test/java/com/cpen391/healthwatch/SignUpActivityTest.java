@@ -1,6 +1,7 @@
 package com.cpen391.healthwatch;
 
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -39,6 +40,8 @@ public class SignUpActivityTest {
     private EditText mConfirmPasswordText;
     private Button mSignUpButton;
     private TextView mLoginLink;
+    private CheckBox mCaretakerCheckbox;
+    private EditText mCaretakerKeyText;
 
     @Before
     public void setUp() throws Exception {
@@ -52,6 +55,8 @@ public class SignUpActivityTest {
         mConfirmPasswordText = mActivity.findViewById(R.id.input_password_confirm);
         mSignUpButton = mActivity.findViewById(R.id.btn_sign_up);
         mLoginLink = mActivity.findViewById(R.id.link_login);
+        mCaretakerCheckbox = mActivity.findViewById(R.id.caretaker_checkbox);
+        mCaretakerKeyText = mActivity.findViewById(R.id.input_caretaker_key);
         GlobalFactory.setServerInterface(mMockServer);
     }
 
@@ -89,5 +94,12 @@ public class SignUpActivityTest {
     public void testLoginLink_shouldFinishActivity() {
         mLoginLink.performClick();
         assertTrue(mActivity.isFinishing());
+    }
+
+    @Test
+    public void testSignUpAsCaretaker_withNoKey_shouldSignalError() {
+        mCaretakerCheckbox.performClick();
+        mSignUpButton.performClick();
+        assertNotNull(mCaretakerKeyText.getError());
     }
 }
