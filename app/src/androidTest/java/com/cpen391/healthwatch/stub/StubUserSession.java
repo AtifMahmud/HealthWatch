@@ -27,6 +27,11 @@ public class StubUserSession implements UserSessionInterface {
     }
 
     @Override
+    public String getUserType() {
+        return null;
+    }
+
+    @Override
     public void setUserToken(Context context, String token) {
         mToken = token;
     }

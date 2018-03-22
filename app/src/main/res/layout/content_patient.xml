@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="23dp"
-        android:text="75 BPM"
+        android:text="@string/default_bpm_message"
         android:textSize="30sp" />
 
 </android.support.v4.widget.NestedScrollView>

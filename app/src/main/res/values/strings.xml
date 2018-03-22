@@ -20,4 +20,14 @@
     <string name="sign_up_user_type_option">Register as caretaker</string>
     <string name="caretaker_key">Caretaker Key</string>
     <string name="patient_image_desc">Patient Image Desc</string>
+    <string name="healthwatch_bt_address">healthwatch.bt.address</string>
+
+    <string name="dialog_use_bluetooth">Do you want to use bluetooth to pair with a HealthWatch device?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="select_healthwatch_device">Please select HealthWatch device to connect to</string>
+    <string name="health_watch">HealthWatch2</string>
+
+    <string name="default_bpm_message">HealthWatch Not Connected</string>
 </resources>
