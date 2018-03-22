@@ -1,5 +1,6 @@
 package com.cpen391.healthwatch.Caretaker;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.CardView;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +17,7 @@ import com.cpen391.healthwatch.R;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private String[] mDataset;
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -25,12 +28,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public ViewHolder(CardView v) {
             super(v);
             mCardView = v;
+
+
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public MyAdapter(String[] myDataset) {
         mDataset = myDataset;
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -38,11 +44,22 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                    int viewType) {
         // create a new view
-        CardView v = (CardView) LayoutInflater.from(parent.getContext())
+        final CardView v = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.my_text_view, parent, false);
 
         ViewHolder vh = new ViewHolder(v);
+        final TextView t = v.findViewById(R.id.info_text);
+
+        final Button mealButton = v.findViewById(R.id.meal_button);
+        mealButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(), "Pressed " + t.getText().toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return vh;
+
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -52,6 +69,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // - replace the contents of the view with that element
         TextView t =  holder.mCardView.findViewById(R.id.info_text);
         t.setText(mDataset[position]);
+
+
 
     }
 

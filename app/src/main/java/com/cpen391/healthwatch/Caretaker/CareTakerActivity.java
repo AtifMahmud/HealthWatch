@@ -38,10 +38,5 @@ public class CareTakerActivity extends AppCompatActivity {
 
     }
 
-    private void mealButtonPressed(){
-        Toast.makeText(this, "Pressed ", Toast.LENGTH_SHORT).show();
-        Log.e("PRESS", "FAB pressed");
-    }
-
 
 }
