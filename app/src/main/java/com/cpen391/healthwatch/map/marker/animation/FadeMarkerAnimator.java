@@ -1,9 +1,12 @@
 package com.cpen391.healthwatch.map.marker.animation;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
+import com.cpen391.healthwatch.util.Callback;
 
 /**
  * Created by william on 2018/3/7.
@@ -24,6 +27,18 @@ public class FadeMarkerAnimator implements MarkerAnimator {
 
     @Override
     public void start() {
+        mAnimator.start();
+    }
+
+    @Override
+    public void start(final Callback callback) {
+        mAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                callback.callback();
+            }
+        });
         mAnimator.start();
     }
 }

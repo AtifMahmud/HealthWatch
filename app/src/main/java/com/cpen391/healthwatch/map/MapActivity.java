@@ -60,6 +60,7 @@ import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
+import com.cpen391.healthwatch.util.Callback;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -525,10 +526,16 @@ public class MapActivity extends FragmentActivity implements
         MarkerAnimator animator;
         if (fadeIn) {
             animator = GlobalFactory.getAbstractMarkerAnimationFactory().createEnterMarkerAnimator(marker);
+            animator.start();
         } else {
             animator = GlobalFactory.getAbstractMarkerAnimationFactory().createExitMarkerAnimator(marker);
+            animator.start(new Callback() {
+                @Override
+                public void callback() {
+                    marker.hideInfoWindow();
+                }
+            });
         }
-        animator.start();
     }
 
     /**
