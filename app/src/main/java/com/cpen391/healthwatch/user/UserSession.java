@@ -14,6 +14,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 /**
@@ -24,6 +25,7 @@ public class UserSession implements UserSessionInterface {
 
     private String mToken;
     private String mUsername;
+    private String mUserType;
 
     @Override
     public boolean isLoggedIn() {
@@ -38,8 +40,10 @@ public class UserSession implements UserSessionInterface {
     @Override
     public void setUserToken(Context context, String token) {
         try {
-            mUsername = Jwts.parser().setSigningKey(getPublicKey(context))
-                    .parseClaimsJws(token).getBody().getSubject();
+            Claims claims = Jwts.parser().setSigningKey(getPublicKey(context))
+                    .parseClaimsJws(token).getBody();
+            mUsername = claims.getSubject();
+            mUserType = claims.getAudience();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -49,6 +53,11 @@ public class UserSession implements UserSessionInterface {
     @Override
     public String getUsername() {
         return mUsername;
+    }
+
+    @Override
+    public String getUserType() {
+        return mUserType;
     }
 
     private PublicKey getPublicKey(Context context) throws Exception {

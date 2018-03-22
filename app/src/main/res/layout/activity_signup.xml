@@ -21,7 +21,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
             android:contentDescription="@string/sign_up_logo_image_desc"
-            android:src="@drawable/circle"/>
+            android:src="@drawable/logo"/>
 
         <!--  Name Label -->
         <android.support.design.widget.TextInputLayout
@@ -72,6 +72,30 @@
                 android:maxLength="@integer/max_password_length"/>
         </android.support.design.widget.TextInputLayout>
 
+
+        <CheckBox
+            android:id="@+id/caretaker_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sign_up_user_type_option"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_caretaker_key_txt_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/input_caretaker_key"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/caretaker_key"
+                android:inputType="textPassword"
+                android:maxLength="@integer/max_password_length"/>
+        </android.support.design.widget.TextInputLayout>
+
         <!-- SignUp Button -->
         <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
             android:id="@+id/btn_sign_up"
@@ -83,6 +107,7 @@
             android:text="@string/create_account"
             android:background="@drawable/circular_border_shape"
             android:layout_gravity="center"
+            android:layout_marginTop="8dp"
             app:initialCornerAngle="50dp"/>
 
         <TextView
