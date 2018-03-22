@@ -27,4 +27,5 @@
     <string name="select_healthwatch_device">Please select HealthWatch device to connect to</string>
     <string name="health_watch">HealthWatch2</string>
 
+    <string name="default_bpm_message">HealthWatch Not Connected</string>
 </resources>

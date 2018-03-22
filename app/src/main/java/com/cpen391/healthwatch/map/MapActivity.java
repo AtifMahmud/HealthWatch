@@ -71,13 +71,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
     private static final String TAG = MapActivity.class.getSimpleName();
     private final int REQUEST_FINE_LOCATION = 1;
-    private final int REQUEST_ENABLE_BLUETOOTH = 2;
-    private final int REQUEST_BLUETOOTH_SETTINGS = 3;
+    private final int REQUEST_FINE_LOCATION_FOR_BLUETOOTH = 2;
+    private final int REQUEST_ENABLE_BLUETOOTH = 3;
+    private final int REQUEST_BLUETOOTH_SETTINGS = 4;
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
@@ -97,15 +99,20 @@ public class MapActivity extends FragmentActivity implements
                 String deviceName = device.getName();
                 String matchName = getString(R.string.health_watch);
                 if (matchName.equals(deviceName)) {
-                    SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(getString(R.string.healthwatch_bt_address), device.getAddress());
-                    editor.apply();
+                    saveBluetoothDevice(device);
                     Toast.makeText(getApplicationContext(), "Connected to HealthWatch device", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     };
+
+
+    private void saveBluetoothDevice(BluetoothDevice device) {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.healthwatch_bt_address), device.getAddress());
+        editor.apply();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,10 +134,17 @@ public class MapActivity extends FragmentActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mBroadcastReceiver);
+        try {
+            unregisterReceiver(mBroadcastReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "receiver is not registered");
+        }
+        stopBluetoothService();
     }
 
     private void setupBluetooth() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        checkPairBluetoothDevices();
         // Set up bluetooth ensuring that it's enabled.
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         mHealthWatchBTAddress = sharedPref.getString(getString(R.string.healthwatch_bt_address), "");
@@ -140,7 +154,6 @@ public class MapActivity extends FragmentActivity implements
             dialog.setListener(new OnClickDialogListener() {
                 @Override
                 public void onPositiveClick() {
-                    mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
                     checkBluetooth();
                 }
                 @Override
@@ -153,6 +166,20 @@ public class MapActivity extends FragmentActivity implements
         } else {
             // Check to see if bluetooth is connected or not, and start to make connection with health watch.
             checkBluetooth();
+        }
+    }
+
+    /**
+     * Check the list of paired bluetooth devices, trying to find the one for Health Watch and connecting
+     * to it.
+     */
+    private void checkPairBluetoothDevices() {
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice device : pairedDevices) {
+            if (getString(R.string.health_watch).equals(device.getName())) {
+                saveBluetoothDevice(device);
+                return;
+            }
         }
     }
 
@@ -181,7 +208,7 @@ public class MapActivity extends FragmentActivity implements
                 PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_FINE_LOCATION);
+                    REQUEST_FINE_LOCATION_FOR_BLUETOOTH);
         } else {
             connectToHealthWatch();
         }
@@ -208,6 +235,11 @@ public class MapActivity extends FragmentActivity implements
         Intent intent = new Intent(this, BluetoothService.class);
         intent.putExtra(BluetoothService.BLUETOOTH_ADDRESS, mHealthWatchBTAddress);
         startService(intent);
+    }
+
+    private void stopBluetoothService() {
+        Intent intent = new Intent(this, BluetoothService.class);
+        stopService(intent);
     }
 
     /**
@@ -321,14 +353,16 @@ public class MapActivity extends FragmentActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_FINE_LOCATION) {
+        if (requestCode == REQUEST_FINE_LOCATION || requestCode == REQUEST_FINE_LOCATION_FOR_BLUETOOTH) {
             if (permissions.length == 1 &&
                     permissions[0].equals(permission.ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     mMap.setMyLocationEnabled(true);
-                    connectToHealthWatch();
+                    if (requestCode == REQUEST_FINE_LOCATION_FOR_BLUETOOTH) {
+                        connectToHealthWatch();
+                    }
                 }
             } else {
                 // Permission was denied. Display a toast to notify user.
