@@ -6,7 +6,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,11 +31,13 @@ public class BluetoothService extends Service {
         void onDataReceived(String data);
     }
     public static final String BLUETOOTH_ADDRESS = "BT_ADDR";
+    public static final int CONNECT_FAILED = 1;
 
     private final String TAG = BluetoothService.class.getSimpleName();
 
     // UUID for connecting to RN-42 bluetooth dongle.
     private static final UUID RN_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
 
     private BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
     private ConnectThread mConnectThread;
@@ -41,6 +46,19 @@ public class BluetoothService extends Service {
     private OnBluetoothDataListener mListener;
 
     private boolean mEndingService;
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message message) {
+            int command = message.what;
+            Log.d(TAG, "Handling message command: " + command);
+            switch(command) {
+                case CONNECT_FAILED:
+                    Toast.makeText(getApplicationContext(), (String)message.obj, Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+            }
+        }
+    };
 
     private final Binder mBinder = new BluetoothBinder();
 
@@ -110,9 +128,6 @@ public class BluetoothService extends Service {
         }
     }
 
-    private void onCannotConnect() {
-        Toast.makeText(getApplicationContext(), "Cannot connect to healthwatch device", Toast.LENGTH_SHORT).show();
-    }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
@@ -206,6 +221,12 @@ public class BluetoothService extends Service {
                 cancel();
                 onCannotConnect();
             }
+        }
+
+        private void onCannotConnect() {
+            Log.e(TAG, "Cannot connect to HealthWatch");
+            Message message = mHandler.obtainMessage(CONNECT_FAILED, "Cannot connect to healthwatch device");
+            message.sendToTarget();
         }
 
         public void cancel() {
