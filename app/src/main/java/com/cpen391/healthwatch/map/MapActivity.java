@@ -30,6 +30,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -59,10 +61,26 @@ import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.util.GlobalFactory;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsRequest.Builder;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+
 import com.google.android.gms.maps.model.LatLng;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,10 +98,16 @@ public class MapActivity extends FragmentActivity implements
     private final int REQUEST_FINE_LOCATION = 1;
     private final int REQUEST_ENABLE_BLUETOOTH = 2;
     private final int REQUEST_BLUETOOTH_SETTINGS = 3;
+    private final int REQUEST_CHECK_LOCATION_SETTINGS = 4;
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
+
     private LocationManager mLocationManager;
+    private LocationRequest mLocationRequest;
+    private LocationCallback mLocationCallback;
+    private FusedLocationProviderClient mFusedLocationClient;
+
     // The last center camera point used to determine when to request map
     // icons from server again.
     private LatLng mLastCameraCenter;
@@ -112,13 +136,17 @@ public class MapActivity extends FragmentActivity implements
                 initMapInterface(new CustomGoogleMap(googleMap));
             }
         });
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setListeners();
+        createLocationRequest();
+        startLocationUpdates();
         setupBluetooth();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopLocationUpdates();
         stopBluetoothService();
     }
 
@@ -181,6 +209,12 @@ public class MapActivity extends FragmentActivity implements
             } else {
                 Toast.makeText(this, "Health Watch device not paired", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == REQUEST_CHECK_LOCATION_SETTINGS) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "Location update enabled", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Location update disabled", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -227,6 +261,55 @@ public class MapActivity extends FragmentActivity implements
                 startActivity(intent);
             }
         });
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                Location lastLocation = locationResult.getLastLocation();
+                if (lastLocation != null) {
+                    sendLocationToServer(lastLocation);
+                }
+            }
+        };
+    }
+
+    /**
+     * Sends the location of the user to the server.
+     *
+     * @param location location of the user, must not be null.
+     */
+    private void sendLocationToServer(Location location) {
+        String jsonLocation = getLocationJSON(location);
+        GlobalFactory.getServerInterface()
+                .asyncPost("/gateway/user/location", jsonLocation, new ServerCallback() {
+                    @Override
+                    public void onSuccessResponse(String response) {
+                        Log.i(TAG, "User location updated on server");
+                    }
+                });
+    }
+
+    /**
+     * @param location location of the user.
+     * @return the json location string required to update user's location on the server.
+     */
+    private String getLocationJSON(Location location) {
+        long time = location.getTime();
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        try {
+            return new JSONObject()
+                    .put("id", GlobalFactory.getUserSessionInterface().getUsername())
+                    .put("time", time)
+                    .put("lat", lat)
+                    .put("lng", lng)
+                    .toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "{}";
     }
 
     /**
@@ -446,6 +529,60 @@ public class MapActivity extends FragmentActivity implements
             animator = GlobalFactory.getAbstractMarkerAnimationFactory().createExitMarkerAnimator(marker);
         }
         animator.start();
+    }
+
+    /**
+     * Create location request required to configure location settings to allow for periodic
+     * location updates.
+     */
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. Initialize location request here.
+                startLocationUpdates();
+            }
+        });
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but we can fix it by showing the
+                    // user a dialog.
+                    try {
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(MapActivity.this, REQUEST_CHECK_LOCATION_SETTINGS);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        });
+    }
+
+    private void startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mLocationCallback,
+                    null);
+        } else {
+            Log.i(TAG, "Trying to start location updates, but no permission is granted");
+        }
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
     /**
