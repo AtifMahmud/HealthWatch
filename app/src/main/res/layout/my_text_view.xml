@@ -30,22 +30,22 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true">
 
-            <android.support.design.widget.FloatingActionButton
+            <Button
                 android:id="@+id/user_button"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/user"
+                android:drawableLeft="@drawable/user"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="end"
                 android:backgroundTint="@color/colorPrimaryLight"/>
 
-            <android.support.design.widget.FloatingActionButton
+            <Button
                 android:id="@+id/meal_button"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/plus"
+                android:drawableLeft="@drawable/plus"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="false"

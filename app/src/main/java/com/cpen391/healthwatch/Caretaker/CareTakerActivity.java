@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,17 +36,7 @@ public class CareTakerActivity extends AppCompatActivity {
         RecyclerView.Adapter mAdapter = new MyAdapter(dataset);
         mRecyclerView.setAdapter(mAdapter);
 
-        View inflatedView = getLayoutInflater().inflate(R.layout.my_text_view, null);
-        FloatingActionButton mealButton =  inflatedView.findViewById(R.id.meal_button);
-
-        mealButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mealButtonPressed();
-            }
-        });
     }
-
 
     private void mealButtonPressed(){
         Toast.makeText(this, "Pressed ", Toast.LENGTH_SHORT).show();
