@@ -18,7 +18,7 @@ import com.cpen391.healthwatch.R;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private String[] mDataset;
-
+    private static Context context;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -29,7 +29,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public ViewHolder(CardView v) {
             super(v);
             mCardView = v;
-
+            context = v.getContext();
 
         }
     }
@@ -55,7 +55,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         mealButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "Pressed " + t.getText().toString(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(view.getContext(), "Pressed " + t.getText().toString(), Toast.LENGTH_SHORT).show();
                 startMealPlan(t);
                 // Need to pass in the name as context to the new activity
             }
@@ -88,8 +88,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private void startMealPlan(TextView t){
 
         // The TextView will be parsed to use in the endpoint/post request and maybe in the GUI as a title "Set Meal Plan for person x"
-
-
+        Intent mealIntent = new Intent(context, MealPlanActivity.class);
+        mealIntent.putExtra("name", t.getText().toString());
+        context.startActivity(mealIntent);
     }
+
+
 
 }
