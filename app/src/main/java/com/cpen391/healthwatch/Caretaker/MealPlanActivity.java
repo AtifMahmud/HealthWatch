@@ -7,6 +7,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +29,7 @@ public class MealPlanActivity extends AppCompatActivity {
 
         TextView nameText = (TextView) findViewById(R.id.nameText);
         nameText.setText("for " + name);
-
+        
     }
 
 }
