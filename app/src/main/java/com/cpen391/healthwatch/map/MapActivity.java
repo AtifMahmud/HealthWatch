@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import com.cpen391.healthwatch.Caretaker.CareTakerActivity;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MapInterface.OnCameraIdleListener;
@@ -88,12 +89,13 @@ public class MapActivity extends FragmentActivity implements
         setListeners();
     }
 
+    // THIS IS WHERE WE START. SO MODIFY THIS TO GO TO CARETAKER ACTIVITY
     private void setListeners() {
         FloatingActionButton actionButton = findViewById(R.id.btn_profile);
         actionButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MapActivity.this, PatientActivity.class);
+                Intent intent = new Intent(MapActivity.this, CareTakerActivity.class);
                 startActivity(intent);
             }
         });

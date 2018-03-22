@@ -4,6 +4,7 @@
  *
  * Sources:
  *      1. https://www.youtube.com/watch?v=InkQJ4riGyI
+ *      2. https://developer.android.com/guide/topics/ui/layout/recyclerview.html#java
  *
  */
 
@@ -19,6 +20,8 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -71,6 +74,7 @@ public class PatientActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setListeners();
         setupUserProfileImage();
+
     }
 
     private void setListeners() {
