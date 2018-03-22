@@ -1,7 +1,30 @@
 <resources>
     <string name="app_name">HealthWatch</string>
-    <string name="title_activity_bluetooth">BluetoothActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_custom_icon_maps">Map</string>
+    <string name="title_activity_patient">PatientActivity</string>
+    <string name="password">Password</string>
+    <string name="password_confirm">Confirm Password</string>
+    <string name="create_account">Create Account</string>
+    <string name="already_a_member">Already a member? Login</string>
+    <string name="username">Username</string>
+    <string name="sign_up_logo_image_desc">Sign Up Image Logo</string>
+    <string name="login_logo_image_desc">Login Image Logo</string>
+    <string name="alpha_num_sequence">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
+    <string name="login">Login</string>
+    <string name="create_account_option">No account yet? Create one</string>
+
+    <string name="preference_file_key">com.cpen391.healthwatch.PREFERENCE_FILE_KEY</string>
+    <string name="login_token">login.token</string>
+
+    <string name="patient_image_desc">Patient Image Desc</string>
+    <string name="healthwatch_bt_address">healthwatch.bt.address</string>
+
+    <string name="dialog_use_bluetooth">Do you want to use bluetooth to pair with a HealthWatch device?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="select_healthwatch_device">Please select HealthWatch device to connect to</string>
+    <string name="health_watch">HealthWatch2</string>
+
 </resources>
