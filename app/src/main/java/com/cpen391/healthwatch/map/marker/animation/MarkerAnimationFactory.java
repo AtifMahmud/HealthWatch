@@ -8,6 +8,7 @@ import android.view.animation.Interpolator;
 
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
 import com.cpen391.healthwatch.map.marker.animation.LatLngInterpolator.Linear;
+import com.cpen391.healthwatch.util.Callback;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -31,6 +32,10 @@ public class MarkerAnimationFactory implements AbstractMarkerAnimationFactory {
             @Override
             public void start() {
                 markerTranslateAnimation(marker, finalPosition);
+            }
+            @Override
+            public void start(Callback callback) {
+                // Not implemented.
             }
         };
     }

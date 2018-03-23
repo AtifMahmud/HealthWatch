@@ -5,6 +5,7 @@ import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -17,12 +18,22 @@ import java.util.Map;
  *
  */
 public class CustomGoogleMap implements MapInterface {
+    private String TAG = CustomGoogleMap.class.getSimpleName();
     private Map<Marker, MarkerInterface> mMarkerMapping;
     private GoogleMap mMap;
 
     public CustomGoogleMap(GoogleMap googleMap) {
         mMap = googleMap;
         mMarkerMapping = new HashMap<>();
+
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                // This prevents user from clicking on marker if it is invisible.
+                return marker.getAlpha() <= 0;
+            }
+        });
     }
 
     @Override
