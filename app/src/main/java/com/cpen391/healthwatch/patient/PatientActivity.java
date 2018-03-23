@@ -1,10 +1,8 @@
 /**
- *
  * Activity for the patient activity page
- *
+ * <p>
  * Sources:
- *      1. https://www.youtube.com/watch?v=InkQJ4riGyI
- *
+ * 1. https://www.youtube.com/watch?v=InkQJ4riGyI
  */
 
 
@@ -72,7 +70,7 @@ public class PatientActivity extends AppCompatActivity {
     private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mBluetoothService = ((BluetoothService.BluetoothBinder)iBinder).getService();
+            mBluetoothService = ((BluetoothService.BluetoothBinder) iBinder).getService();
             setupBluetoothServiceCallbacks();
         }
 
@@ -158,7 +156,7 @@ public class PatientActivity extends AppCompatActivity {
         }, new ServerErrorCallback() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (error.networkResponse.statusCode == 404) {
+                if (error.networkResponse != null && error.networkResponse.statusCode == 404) {
                     Log.d(TAG, "No user profile image found");
                 }
             }
