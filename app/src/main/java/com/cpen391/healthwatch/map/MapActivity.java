@@ -346,6 +346,7 @@ public class MapActivity extends FragmentActivity implements
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
+                Log.d(TAG, "Getting location result: " + locationResult);
                 if (locationResult == null) {
                     return;
                 }
@@ -624,6 +625,7 @@ public class MapActivity extends FragmentActivity implements
      * location updates.
      */
     private void createLocationRequest() {
+        Log.d(TAG, "create location request");
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
@@ -659,6 +661,7 @@ public class MapActivity extends FragmentActivity implements
     }
 
     private void startLocationUpdates() {
+        Log.d(TAG, "Starting location updates");
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
