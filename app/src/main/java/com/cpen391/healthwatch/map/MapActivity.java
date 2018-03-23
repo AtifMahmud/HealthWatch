@@ -30,7 +30,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
-
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -48,6 +47,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog.OnClickDialogListener;
@@ -60,6 +60,7 @@ import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
+import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.util.Callback;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -75,23 +76,25 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-
-import com.google.android.gms.maps.model.LatLng;
-
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -124,6 +127,11 @@ public class MapActivity extends FragmentActivity implements
         editor.apply();
     }
 
+    // Timer to periodically pull user locations from the server.
+    private Timer mLocationRequestTimer;
+
+    private List<MarkerInterface> mUserMarkers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,14 +147,87 @@ public class MapActivity extends FragmentActivity implements
         });
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setListeners();
+        setupBluetooth();
         createLocationRequest();
         startLocationUpdates();
-        setupBluetooth();
+        setPeriodicLocationPulling();
+        mUserMarkers = new ArrayList<>();
+    }
+
+    private void setPeriodicLocationPulling() {
+        mLocationRequestTimer = new Timer();
+        mLocationRequestTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getOtherUserLocations();
+            }
+        }, 0, 5000);
+    }
+
+    /**
+     * Get the location of other users and update it on the map.
+     */
+    private void getOtherUserLocations() {
+        Log.d(TAG, "Getting other user location");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        GlobalFactory.getServerInterface().asyncGet("/gateway/patients/location", headers, new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Obtained response: " + response);
+                updateOtherUserLocationsOnMap(response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "getting other user location obtained error");
+            }
+        });
+    }
+
+    private void updateOtherUserLocationsOnMap(String response) {
+        try {
+            JSONArray userLocationArr = new JSONArray(response);
+            for (int i = 0; i < userLocationArr.length(); i++) {
+                JSONObject userLocationJSON = userLocationArr.getJSONObject(i);
+                updateSingleOtherUserOnMap(userLocationJSON);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateSingleOtherUserOnMap(JSONObject userLocationJSON) throws JSONException {
+        String username = userLocationJSON.getString("username");
+        JSONObject locationJSON = userLocationJSON.getJSONObject("location");
+        double lat = locationJSON.getDouble("lat");
+        double lng = locationJSON.getDouble("lng");
+        LatLng position = new LatLng(lat, lng);
+        MarkerInterface marker = userInMarkerList(username);
+        if (marker == null) {
+            marker = mMap.addMarker(new MarkerOptions().title(username).position(position));
+            mUserMarkers.add(marker);
+        } else {
+            MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
+                    .createMarkerTransitionAnimator(marker, position);
+            transitionAnimator.start();
+        }
+    }
+
+    private MarkerInterface userInMarkerList(String username) {
+        for (MarkerInterface marker : mUserMarkers) {
+            if (username.equals(marker.getTitle())) {
+                return marker;
+            }
+        }
+        return null;
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
+        mLocationRequestTimer.cancel();
+
         stopLocationUpdates();
         stopBluetoothService();
     }

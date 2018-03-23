@@ -13,6 +13,7 @@ public interface MarkerAnimator {
     void start();
 
     /**
+     * Optional:
      * Starts the animation passing in a callback to be invoked on animation end.
      * @param callback the callback to be invoked on animation completion.
      */
