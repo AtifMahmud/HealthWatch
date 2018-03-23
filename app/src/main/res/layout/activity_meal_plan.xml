@@ -24,7 +24,7 @@
 
 
                 <EditText
-                    android:id="@+id/editText7"
+                    android:id="@+id/meal"
                     android:layout_width="83dp"
                     android:layout_height="41dp"
                     android:layout_marginBottom="8dp"
@@ -36,7 +36,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0" />
+                    app:layout_constraintVertical_bias="0.100000024" />
 
                 <TextView
                     android:id="@+id/nameText"
@@ -52,7 +52,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/button3"
+                    android:id="@+id/send"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
@@ -67,7 +67,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <TimePicker
-                android:id="@+id/timePicker2"
+                android:id="@+id/time"
                 android:layout_width="310dp"
                 android:layout_height="339dp"
                 android:layout_marginBottom="8dp"
@@ -80,7 +80,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
-                android:id="@+id/editText8"
+                android:id="@+id/item1"
                 android:layout_width="215dp"
                 android:layout_height="45dp"
                 android:layout_marginBottom="8dp"
@@ -95,7 +95,7 @@
                 app:layout_constraintVertical_bias="0.867" />
 
             <EditText
-                android:id="@+id/editText9"
+                android:id="@+id/item2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -105,7 +105,7 @@
                 tools:layout_editor_absoluteY="504dp" />
 
             <EditText
-                android:id="@+id/editText9"
+                android:id="@+id/item3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -127,9 +127,10 @@
                 android:backgroundTint="@color/colorPrimaryLight"/>
 
             <MultiAutoCompleteTextView
+                android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@android:dimen/app_icon_size"/>
+                android:layout_margin="@android:dimen/app_icon_size" />
 
         </LinearLayout>
 
