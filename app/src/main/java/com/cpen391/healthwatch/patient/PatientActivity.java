@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView.OnLoadCompleteListener;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.UploadImageTask;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,6 +88,14 @@ public class PatientActivity extends AppCompatActivity {
             public void onLoadComplete() {
                 Log.d(TAG, "Loading image complete");
                 mImageProgressSpinner.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        final Button mealButton = (Button) findViewById(R.id.meal_plan_button);
+        mealButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Toast.makeText(getApplicationContext(), "MARCO", Toast.LENGTH_SHORT).show();
             }
         });
     }

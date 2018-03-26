@@ -69,4 +69,10 @@
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"/>
 
+    <Button
+        android:id="@+id/meal_plan_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Meal Plans" />
+
 </android.support.design.widget.CoordinatorLayout>
