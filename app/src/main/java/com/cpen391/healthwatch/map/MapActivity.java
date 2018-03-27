@@ -168,13 +168,13 @@ public class MapActivity extends FragmentActivity implements
      * Get the location of other users and update it on the map.
      */
     private void getOtherUserLocations() {
-        Log.d(TAG, "Getting other user location");
+        //Log.d(TAG, "Getting other user location");
         Map<String, String> headers = new HashMap<>();
         headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
         GlobalFactory.getServerInterface().asyncGet("/gateway/patients/location", headers, new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                Log.d(TAG, "Obtained response: " + response);
+                //Log.d(TAG, "Obtained response: " + response);
                 updateOtherUserLocationsOnMap(response);
             }
         }, new ServerErrorCallback() {
@@ -369,7 +369,7 @@ public class MapActivity extends FragmentActivity implements
                 .asyncPost("/gateway/user/location", jsonLocation, new ServerCallback() {
                     @Override
                     public void onSuccessResponse(String response) {
-                        Log.i(TAG, "User location updated on server");
+                        //Log.i(TAG, "User location updated on server");
                     }
                 });
     }

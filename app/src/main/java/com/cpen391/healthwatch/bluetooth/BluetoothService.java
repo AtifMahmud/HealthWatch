@@ -29,6 +29,7 @@ public class BluetoothService extends Service {
 
     public interface OnBluetoothDataListener {
         void onDataReceived(String data);
+        void onDataReceived(byte[] data, int offset, int size);
     }
     public static final String BLUETOOTH_ADDRESS = "BT_ADDR";
     public static final int CONNECT_FAILED = 1;
@@ -128,6 +129,11 @@ public class BluetoothService extends Service {
         }
     }
 
+    public synchronized void sendReceivedData(byte[] data, int offset, int size) {
+        if (mListener != null) {
+            mListener.onDataReceived(data, offset, size);
+        }
+    }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
@@ -144,6 +150,8 @@ public class BluetoothService extends Service {
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInputStream;
+        private final byte[] mmBuffer;
+        private int mmBufferIndex;
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
@@ -155,6 +163,8 @@ public class BluetoothService extends Service {
                 Log.e(TAG, "input and output stream might not be created");
             }
             mmInputStream = is;
+            mmBuffer = new byte[1024 * 1024];
+            mmBufferIndex = 0;
         }
 
         @Override
@@ -168,11 +178,15 @@ public class BluetoothService extends Service {
             while (true) {
                 try {
                     // Read from the InputStream
-                    //bytes = mmInputStream.read(buffer);
-                    String data = br.readLine();
-                    sendReceivedData(data);
-                    // Send the obtained bytes to the UI Activity
-                    Log.d(TAG,"obtained: " + data);
+                    bytes = mmInputStream.read(buffer);
+                    Log.d(TAG, "Read " + bytes + " number of bytes");
+                    for (int i = 0; i < bytes; i++) {
+                        mmBuffer[mmBufferIndex++] = buffer[i];
+                    }
+                    if (mmBufferIndex >= 40 * 1024) {
+                        sendReceivedData(mmBuffer, 0, mmBufferIndex);
+                        mmBufferIndex = 0;
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     onConnectionLost();

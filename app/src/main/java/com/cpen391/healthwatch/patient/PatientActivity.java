@@ -46,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -124,7 +125,42 @@ public class PatientActivity extends AppCompatActivity {
                     }
                 });
             }
+
+            @Override
+            public void onDataReceived(final byte[] data, int offset, int size) {
+                if (!isExternalStorageWritable()) {
+                    Log.d(TAG, "Unable to write to external storage");
+                    return;
+                }
+                Log.d(TAG, "Writing to file: " + getFilesDir().getAbsolutePath());
+                String filename = "myFile";
+                File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                if (dir == null) {
+                    Log.e(TAG, "External directory is null");
+                    return;
+                }
+                if (!dir.exists() && !dir.mkdirs()) {
+                    Log.e(TAG, "Directory not created");
+                    return;
+                }
+                File file = new File(dir, filename);
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    outputStream.write(data, offset, size);
+                    outputStream.close();
+                    Log.d(TAG, "Completed file write");
+                } catch (IOException e) {
+                    Log.d(TAG, "exception when writing to file");
+                    e.printStackTrace();
+                }
+            }
         });
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     private void setListeners() {
