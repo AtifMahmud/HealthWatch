@@ -46,6 +46,7 @@ public class SplashActivity extends AppCompatActivity {
             // Should check token is valid, here, leaving for later.
             GlobalFactory.getUserSessionInterface().setUserToken(this, token);
             Log.d(TAG, "username: " + GlobalFactory.getUserSessionInterface().getUsername());
+            Log.d(TAG, "user type: " + GlobalFactory.getUserSessionInterface().getUserType());
         }
         return !token.isEmpty();
     }

@@ -28,6 +28,12 @@ public interface UserSessionInterface {
     String getUsername();
 
     /**
+     *
+     * @return the type of the user.
+     */
+    String getUserType();
+
+    /**
      * Sets jwt user token.
      *
      * Obtains the username from the "sub" field of the jwt token and

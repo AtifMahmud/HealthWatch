@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cpen391.healthwatch">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -34,12 +36,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".Caretaker.CareTakerActivity"
             android:label="@string/title_activity_care_taker"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".user.SignUpActivity" />
         <activity android:name=".user.LoginActivity" />
+
+        <service
+            android:name=".bluetooth.BluetoothService"
+            android:exported="false" />
+
+        <activity android:name=".user.SignUpActivity"/>
+        <activity android:name=".user.LoginActivity"/>
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

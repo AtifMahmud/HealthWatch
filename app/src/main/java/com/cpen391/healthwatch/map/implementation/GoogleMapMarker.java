@@ -65,4 +65,9 @@ public class GoogleMapMarker implements MarkerInterface {
     public void setIcon(int resId) {
         mMarker.setIcon(BitmapDescriptorFactory.fromResource(resId));
     }
+
+    @Override
+    public String getTitle() {
+        return mMarker.getTitle();
+    }
 }
