@@ -1,25 +1,20 @@
-package com.cpen391.healthwatch.Caretaker;
+package com.cpen391.healthwatch.caretaker;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.util.GlobalFactory;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;

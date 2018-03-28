@@ -38,7 +38,7 @@
         </activity>
 
         <activity
-            android:name=".Caretaker.CareTakerActivity"
+            android:name=".caretaker.CareTakerActivity"
             android:label="@string/title_activity_care_taker"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".user.SignUpActivity" />
@@ -82,9 +82,9 @@
         </provider>
 
         <activity
-            android:name=".Caretaker.MealPlanActivity"
+            android:name=".caretaker.MealPlanActivity"
             android:label="@string/title_activity_meal_plan"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

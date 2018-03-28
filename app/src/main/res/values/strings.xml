@@ -34,4 +34,7 @@
     <string name="health_watch">HealthWatch2</string>
 
     <string name="default_bpm_message">HealthWatch Not Connected</string>
+    <string name="patients">Patients</string>
+
+    <string name="patient_meal_plan_edit_image_view_desc">PatientMealPlanEditImageViewDesc</string>
 </resources>
