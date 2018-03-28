@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.caretaker.PatientListAdapter.PatientItemClickListener;
+import com.cpen391.healthwatch.mealplan.MealPlanActivity;
 import com.cpen391.healthwatch.user.UserProfileOperator;
 import com.cpen391.healthwatch.user.UserProfileOperator.UserProfileImageListener;
 import com.cpen391.healthwatch.util.BitmapDecodeTask;
@@ -50,8 +51,8 @@ public class CareTakerActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.patient_recycler_view);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mLayoutManager);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
         mPatientListAdapter = new PatientListAdapter(mDataset);
         recyclerView.setAdapter(mPatientListAdapter);
         ItemDecoration dividerItemDecoration = new PatientListDividerItemDecoration(getApplicationContext(), R.drawable.divider);

@@ -1,28 +1,3 @@
-/*
- * This activity will show the locations on the map with custom icons. Before the server is set-up, test
- * with dummy JSON.
- *
- * @author: Atif Mahmud
- * @since: 2018-03-03
- *
- * Sources:
- *      1. https://stackoverflow.com/questions/17810044/android-create-json-array-and-json-object
- *      2. https://developers.google.com/android/reference/com/google/android/gms/maps/model/LatLng
- *      3. https://stackoverflow.com/questions/28736419/parsing-json-array-and-object-in-android
- *      4. https://stackoverflow.com/questions/1520887/how-to-pause-sleep-thread-or-process-in-android
- *      5. https://stackoverflow.com/questions/18486503/android-google-maps-api-v2-how-to-change-marker-icon
- *      6. https://stackoverflow.com/questions/29983733/adding-new-markers-on-map-using-cluster-manager-doesnt-reflect-the-changes-unti
- *
- * FOR REFERENCE:
- *       {
- *           "type": String (either "hospital" or "ambulance")
- *           "latitude": int    // North
- *           "longitude":int    // East
- *           "place":  String
- *       }
- *
- */
-
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;

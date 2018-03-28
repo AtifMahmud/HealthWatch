@@ -34,7 +34,20 @@
     <string name="health_watch">HealthWatch2</string>
 
     <string name="default_bpm_message">HealthWatch Not Connected</string>
-    <string name="patients">Patients</string>
+    <string name="patients_list_header">Patients</string>
 
     <string name="patient_meal_plan_edit_image_view_desc">PatientMealPlanEditImageViewDesc</string>
+    <string name="action_done">Done</string>
+
+    <string name="meal_edit_title">Meal Form</string>
+    <string name="meal_name">Meal Name</string>
+
+    <string name="meal_edit_footer_image_view_desc">MealEditFooterImageViewDesc</string>
+    <string name="meal_edit_list_header">Meal Items</string>
+
+    <string name="dialog_confirm_unsaved">Leave without submitting?</string>
+    <string name="leave">Leave</string>
+    <string name="stay">Stay</string>
+
+    <string name="dialog_confirm_fields">Confirm submission?</string>
 </resources>

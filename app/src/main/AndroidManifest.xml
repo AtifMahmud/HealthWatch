@@ -48,9 +48,6 @@
             android:name=".bluetooth.BluetoothService"
             android:exported="false" />
 
-        <activity android:name=".user.SignUpActivity"/>
-        <activity android:name=".user.LoginActivity"/>
-
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -82,9 +79,7 @@
         </provider>
 
         <activity
-            android:name=".caretaker.MealPlanActivity"
-            android:label="@string/title_activity_meal_plan"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:name=".mealplan.MealPlanActivity"/>
     </application>
 
 </manifest>

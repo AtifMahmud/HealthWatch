@@ -30,7 +30,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_patient_header, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_header, parent, false);
             return new HeaderViewHolder(v);
         }
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_patient_item, parent, false);
@@ -40,7 +40,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) holder).mTextView.setText(R.string.patients);
+            ((HeaderViewHolder) holder).mTextView.setText(R.string.patients_list_header);
         } else {
             // Since first position is reserved for header the position of the item is offset by one
             ItemViewHolder ivh = (ItemViewHolder) holder;
@@ -49,7 +49,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public void setOnPatientItemClickListener(PatientItemClickListener listener) {
+    void setOnPatientItemClickListener(PatientItemClickListener listener) {
         mListener = listener;
     }
 
