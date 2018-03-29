@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -37,6 +39,7 @@ public class SignUpActivity extends Activity
     private EditText mUsernameText;
     private EditText mPasswordText;
     private EditText mConfirmPasswordText;
+    private EditText mPhoneText;
     private CircularProgressButton mSignUpButton;
     private CheckBox mCaretakerCheckbox;
     private TextInputLayout mCaretakerKeyTextLayout;
@@ -78,6 +81,7 @@ public class SignUpActivity extends Activity
                 }
             }
         });
+        mPhoneText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
     }
 
     private void obtainViews() {
@@ -88,6 +92,7 @@ public class SignUpActivity extends Activity
         mCaretakerCheckbox = findViewById(R.id.caretaker_checkbox);
         mCaretakerKeyTextLayout = findViewById(R.id.input_caretaker_key_txt_layout);
         mCaretakerKeyText = findViewById(R.id.input_caretaker_key);
+        mPhoneText = findViewById(R.id.input_phone);
     }
 
     /**
@@ -100,6 +105,7 @@ public class SignUpActivity extends Activity
         mPasswordText.setError(null);
         mConfirmPasswordText.setError(null);
         mCaretakerKeyText.setError(null);
+        mPhoneText.setError(null);
 
         boolean noError = true;
         final int MIN_USERNAME_LENGTH = 2;
@@ -108,6 +114,7 @@ public class SignUpActivity extends Activity
         String username = mUsernameText.getText().toString();
         String password = mPasswordText.getText().toString();
         String confirmPassword = mConfirmPasswordText.getText().toString();
+        String phoneNumber = mPhoneText.getText().toString();
         boolean caretakerOptionChecked = mCaretakerCheckbox.isChecked();
 
         if (username.length() < MIN_USERNAME_LENGTH) {
@@ -125,6 +132,11 @@ public class SignUpActivity extends Activity
             noError = false;
         }
 
+        if (!isValidPhoneNumber(phoneNumber)) {
+            mPhoneText.setError("Phone number is invalid");
+            noError = false;
+        }
+
         if (caretakerOptionChecked) {
             String caretakerKey = mCaretakerKeyText.getText().toString();
             if (caretakerKey.isEmpty()) {
@@ -133,6 +145,10 @@ public class SignUpActivity extends Activity
             }
         }
         return noError;
+    }
+
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        return !phoneNumber.isEmpty() && Patterns.PHONE.matcher(phoneNumber).matches();
     }
 
     private void signUp() {
@@ -184,6 +200,7 @@ public class SignUpActivity extends Activity
             if (mCaretakerCheckbox.isChecked()) {
                 userJSON.put("carekey", mCaretakerKeyText.getText().toString());
             }
+            userJSON.put("phone", mPhoneText.getText().toString());
             return new JSONObject()
                     .put("user", userJSON)
                     .toString();

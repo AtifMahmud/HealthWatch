@@ -13,6 +13,7 @@
     <string name="sign_up_logo_image_desc">Sign Up Image Logo</string>
     <string name="login_logo_image_desc">Login Image Logo</string>
     <string name="alpha_num_sequence">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
+    <string name="phone_number">Phone Number</string>
     <string name="login">Login</string>
     <string name="create_account_option">No account yet? Create one</string>
 
@@ -50,4 +51,7 @@
     <string name="stay">Stay</string>
 
     <string name="dialog_confirm_fields">Confirm submission?</string>
+    <string name="mobile">Mobile</string>
+
+    <string name="caretaker_phone_image_desc">CareTakerPhoneImageDesc</string>
 </resources>

@@ -173,6 +173,7 @@ public class MealPlanActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
                     }
                 });*/
+        setResult(RESULT_OK);
         finish();
     }
 

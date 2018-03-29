@@ -30,7 +30,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_header, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.caretaker_page_header, parent, false);
             return new HeaderViewHolder(v);
         }
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_patient_item, parent, false);

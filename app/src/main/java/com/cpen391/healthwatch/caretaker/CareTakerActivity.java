@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +28,7 @@ import com.cpen391.healthwatch.util.GlobalFactory;
 public class CareTakerActivity extends AppCompatActivity {
     private final String TAG = CareTakerActivity.class.getSimpleName();
 
+    private static final int REQUEST_EDIT_MEAL_PLAN = 10;
     private UserProfileOperator mImageOperator;
     private FadeInNetworkImageView mProfileImage;
     private PatientListAdapter mPatientListAdapter;
@@ -55,7 +57,7 @@ public class CareTakerActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         mPatientListAdapter = new PatientListAdapter(mDataset);
         recyclerView.setAdapter(mPatientListAdapter);
-        ItemDecoration dividerItemDecoration = new PatientListDividerItemDecoration(getApplicationContext(), R.drawable.divider);
+        ItemDecoration dividerItemDecoration = new PatientListDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
@@ -71,8 +73,7 @@ public class CareTakerActivity extends AppCompatActivity {
             @Override
             public void onEditClick(String patientName) {
                 Intent intent = new Intent(CareTakerActivity.this, MealPlanActivity.class);
-                intent.putExtra("name", patientName);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_EDIT_MEAL_PLAN);
             }
         });
     }
@@ -101,6 +102,10 @@ public class CareTakerActivity extends AppCompatActivity {
                     bitmapDecodeTask.execute(mImageOperator.getCurrentPhotoPath());
                 }
             });
+        } else if (requestCode == REQUEST_EDIT_MEAL_PLAN && resultCode == RESULT_OK) {
+            Snackbar snackbar = Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content),
+                    "Meal Plan Sent!", Snackbar.LENGTH_LONG);
+            snackbar.show();
         }
     }
 
