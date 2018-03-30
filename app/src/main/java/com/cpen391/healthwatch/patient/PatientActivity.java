@@ -1,17 +1,3 @@
-/**
- * Activity for the patient activity page
- * <p>
- * Sources:
-<<<<<<< HEAD
- *      1. https://www.youtube.com/watch?v=InkQJ4riGyI
- *      2. https://developer.android.com/guide/topics/ui/layout/recyclerview.html#java
- *
-=======
- * 1. https://www.youtube.com/watch?v=InkQJ4riGyI
->>>>>>> 39fa8cb3682ca67b9530e370e97c00361a155564
- */
-
-
 package com.cpen391.healthwatch.patient;
 
 import android.content.ComponentName;
