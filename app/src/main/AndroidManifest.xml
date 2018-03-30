@@ -8,12 +8,15 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="false" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-                     android:maxSdkVersion="18"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -22,16 +25,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplashActivity"
-                  android:theme="@style/SplashTheme">
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".user.SignUpActivity"/>
-        <activity android:name=".user.LoginActivity"/>
+        <activity android:name=".user.SignUpActivity" />
+        <activity android:name=".user.LoginActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -45,13 +49,12 @@
             android:value="AIzaSyBoIKpzOUBgWx8E8XRSGIIANjBLNMc7Us0" />
 
         <activity
-            android:name="com.cpen391.healthwatch.map.MapActivity"
-            android:label="@string/title_activity_custom_icon_maps"/>
-
+            android:name=".map.MapActivity"
+            android:label="@string/title_activity_custom_icon_maps" />
         <activity
             android:name=".patient.PatientActivity"
             android:label="@string/title_activity_patient"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -60,8 +63,13 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
+
+        <activity
+            android:name=".patient.PatientMeals"
+            android:label="@string/title_activity_patient_meals"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

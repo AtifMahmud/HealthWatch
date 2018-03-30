@@ -18,4 +18,5 @@
     <string name="login_token">login.token</string>
 
     <string name="patient_image_desc">Patient Image Desc</string>
+    <string name="title_activity_patient_meals">PatientMeals</string>
 </resources>

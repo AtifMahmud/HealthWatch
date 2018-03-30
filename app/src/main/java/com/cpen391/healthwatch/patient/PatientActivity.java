@@ -95,7 +95,8 @@ public class PatientActivity extends AppCompatActivity {
         mealButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                Toast.makeText(getApplicationContext(), "MARCO", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), PatientMeals.class);
+                startActivity(intent);
             }
         });
     }
