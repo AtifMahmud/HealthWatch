@@ -32,8 +32,7 @@
                 android:id="@+id/input_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapCharacters"
-                android:digits="@string/alpha_num_sequence"
+                android:inputType="textCapWords"
                 android:hint="@string/username"/>
         </android.support.design.widget.TextInputLayout>
 

@@ -1,5 +1,6 @@
 package com.cpen391.healthwatch.mealplan;
 
+import android.content.Intent;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -7,7 +8,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TimePicker;
@@ -24,6 +24,8 @@ import org.json.JSONObject;
 public class MealPlanActivity extends AppCompatActivity
         implements OnConfirmUnsavedDialogListener,
         OnConfirmFieldsDialogListener {
+    public static final String PATIENT_NAME = "name";
+    public static final String MEAL_DATA = "data";
     private final String TAG = MealPlanActivity.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
@@ -38,14 +40,14 @@ public class MealPlanActivity extends AppCompatActivity
             actionBar.setTitle(R.string.meal_edit_title);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        setupMealEditItemList();
+        setupMealEditItemList(getIntent().getStringExtra(PATIENT_NAME));
     }
 
-    private void setupMealEditItemList() {
+    private void setupMealEditItemList(String name) {
         mRecyclerView = findViewById(R.id.meal_plan_item_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        mMealPlanItemAdapter = new MealPlanFormAdapter();
+        mMealPlanItemAdapter = new MealPlanFormAdapter(name);
         mRecyclerView.setAdapter(mMealPlanItemAdapter);
         mRecyclerView.getRecycledViewPool().setMaxRecycledViews(MealPlanFormAdapter.TYPE_HEADER, 0);
     }
@@ -159,21 +161,9 @@ public class MealPlanActivity extends AppCompatActivity
     @Override
     public void onConfirmFieldsDialogPositiveClick() {
         String mealPlanJson = obtainMealPlanJsonString();
-        Log.d(TAG, "Meal Plan json object: " + mealPlanJson);
-        /*
-        GlobalFactory.getServerInterface().asyncPost("/gateway/user/meal-plan", null, mealPlanJson,
-                new ServerCallback() {
-                    @Override
-                    public void onSuccessResponse(String response) {
-
-                    }
-                }, new ServerErrorCallback() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "Unable to connect to server", Toast.LENGTH_SHORT).show();
-                    }
-                });*/
-        setResult(RESULT_OK);
+        Intent data = new Intent();
+        data.putExtra(MEAL_DATA, mealPlanJson);
+        setResult(RESULT_OK, data);
         finish();
     }
 
@@ -183,12 +173,13 @@ public class MealPlanActivity extends AppCompatActivity
             JSONObject mealTimeObj = new JSONObject()
                     .put("hour", getTimePickerHour(vh.mTimePicker))
                     .put("minute", getTimePickerMinute(vh.mTimePicker));
-            JSONObject mealJsonObj = new JSONObject()
+            JSONObject mealItemsObj = new JSONObject()
                     .put("name", vh.mEditText.getText().toString())
                     .put("time", mealTimeObj)
                     .put("items", mMealPlanItemAdapter.getMealItems());
             return new JSONObject()
-                    .put("meal", mealJsonObj)
+                    .put("username", mMealPlanItemAdapter.getPatientName())
+                    .put("diet", mealItemsObj)
                     .toString();
         } catch (JSONException e) {
             e.printStackTrace();

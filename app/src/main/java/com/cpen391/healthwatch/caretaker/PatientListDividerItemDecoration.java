@@ -22,13 +22,16 @@ public class PatientListDividerItemDecoration extends RecyclerView.ItemDecoratio
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         ViewHolder topView = parent.findViewHolderForAdapterPosition(0);
+        ViewHolder botView = parent.findViewHolderForAdapterPosition(parent.getAdapter().getItemCount() - 1);
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
 
         int childCount = parent.getChildCount();
         // Skip header
         int i = topView == null ? 0 : 1;
-        for (; i < childCount; i++) {
+        // Don't put divider after last item
+        int end = botView == null ? childCount : childCount - 1;
+        for (; i < end; i++) {
             View child = parent.getChildAt(i);
 
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();

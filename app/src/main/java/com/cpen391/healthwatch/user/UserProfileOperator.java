@@ -74,7 +74,7 @@ public class UserProfileOperator {
         });
     }
 
-    private void getUserProfileImage(String imageFilePathJson, FadeInNetworkImageView profileImage) {
+    public void getUserProfileImage(String imageFilePathJson, FadeInNetworkImageView profileImage) {
         try {
             String imageFilePath = new JSONObject(imageFilePathJson).getString("image");
             String url = ServerInterface.BASE_URL + "/gateway/user/image/" + imageFilePath;

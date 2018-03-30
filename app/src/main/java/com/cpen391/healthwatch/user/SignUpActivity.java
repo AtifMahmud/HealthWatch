@@ -107,8 +107,7 @@ public class SignUpActivity extends Activity
         mCaretakerKeyText.setError(null);
         mPhoneText.setError(null);
 
-        boolean noError = true;
-        final int MIN_USERNAME_LENGTH = 2;
+        boolean noError;
         final int MIN_PASSWORD_LENGTH = 8;
 
         String username = mUsernameText.getText().toString();
@@ -117,10 +116,7 @@ public class SignUpActivity extends Activity
         String phoneNumber = mPhoneText.getText().toString();
         boolean caretakerOptionChecked = mCaretakerCheckbox.isChecked();
 
-        if (username.length() < MIN_USERNAME_LENGTH) {
-            mUsernameText.setError(String.format(Locale.CANADA, "Username must be greater than %d letters", MIN_USERNAME_LENGTH));
-            noError = false;
-        }
+        noError = validateUsername(username);
 
         if (password.length() < MIN_PASSWORD_LENGTH) {
             mPasswordText.setError(String.format(Locale.CANADA, "Password must be greater than %d characters", MIN_PASSWORD_LENGTH));
@@ -145,6 +141,19 @@ public class SignUpActivity extends Activity
             }
         }
         return noError;
+    }
+
+    private boolean validateUsername(String username) {
+        final int MIN_USERNAME_LENGTH = 2;
+        if (username.length() < MIN_USERNAME_LENGTH) {
+            mUsernameText.setError(String.format(Locale.CANADA, "Username must be greater than %d letters", MIN_USERNAME_LENGTH));
+            return false;
+        }
+        if (username.contains(" ")) {
+            mUsernameText.setError("Username must not contain spaces");
+            return false;
+        }
+        return true;
     }
 
     private boolean isValidPhoneNumber(String phoneNumber) {
@@ -200,9 +209,11 @@ public class SignUpActivity extends Activity
             if (mCaretakerCheckbox.isChecked()) {
                 userJSON.put("carekey", mCaretakerKeyText.getText().toString());
             }
-            userJSON.put("phone", mPhoneText.getText().toString());
+            JSONObject dataJSON = new JSONObject()
+                    .put("phone", mPhoneText.getText().toString());
             return new JSONObject()
                     .put("user", userJSON)
+                    .put("data", dataJSON)
                     .toString();
         } catch (JSONException e) {
             e.printStackTrace();

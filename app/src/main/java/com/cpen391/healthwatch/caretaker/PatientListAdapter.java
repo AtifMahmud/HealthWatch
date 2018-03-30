@@ -1,5 +1,8 @@
 package com.cpen391.healthwatch.caretaker;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,19 +14,25 @@ import android.widget.TextView;
 
 import com.cpen391.healthwatch.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public interface PatientItemClickListener {
         void onEditClick(String patientName);
+        void onProfileClick(String patientName);
     }
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    private String[] mDataset;
+    private List<String> mDataset;
     private PatientItemClickListener mListener;
+    private Context mContext;
 
-    PatientListAdapter(String[] dataset) {
-        mDataset = dataset;
+    PatientListAdapter(Context context) {
+        mDataset = new ArrayList<>();
+        mContext = context;
     }
 
     @NonNull
@@ -44,9 +53,14 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else {
             // Since first position is reserved for header the position of the item is offset by one
             ItemViewHolder ivh = (ItemViewHolder) holder;
-            ivh.mTextView.setText(mDataset[position - 1]);
-            ivh.bind(mListener, mDataset[position - 1]);
+            ivh.mTextView.setText(mDataset.get(position - 1));
+            ivh.bind(mListener, mDataset.get(position - 1));
         }
+    }
+
+    void addPatient(String patientName) {
+        mDataset.add(patientName);
+        notifyItemInserted(mDataset.size());
     }
 
     void setOnPatientItemClickListener(PatientItemClickListener listener) {
@@ -56,7 +70,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemCount() {
         // Plus one for the header
-        return mDataset.length + 1;
+        return mDataset.size() + 1;
     }
 
     @Override
@@ -87,15 +101,37 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         listener.onEditClick(patientName);
                     }
                 });
+                mCircularImageProfile.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        listener.onProfileClick(patientName);
+                    }
+                });
             }
         }
     }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
+        ImageView mProfilePhoneIcon;
+        TextView mProfilePhoneNumber;
         TextView mTextView;
         HeaderViewHolder(View view) {
             super(view);
+            mProfilePhoneIcon = view.findViewById(R.id.profile_phone_icon);
+            mProfilePhoneNumber = view.findViewById(R.id.profile_phone_number);
             mTextView = view.findViewById(R.id.header);
+            mProfilePhoneIcon.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String phoneNumber = mProfilePhoneNumber.getText().toString();
+                    if (!phoneNumber.isEmpty()) {
+                        String uri = "tel:" + phoneNumber;
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse(uri));
+                        mContext.startActivity(intent);
+                    }
+                }
+            });
         }
     }
 }

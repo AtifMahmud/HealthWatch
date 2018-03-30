@@ -4,44 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/caretaker_info_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:contentDescription="@string/caretaker_phone_image_desc"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_phone_black_36dp"/>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_marginStart="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/caretaker_phone_number"
-                android:layout_marginTop="16dp"
-                android:text="(604) 555-1234"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#9E9E9E"
-                android:text="@string/mobile"/>
-        </LinearLayout>
-    </LinearLayout>
+    <include layout="@layout/content_profile_info"/>
 
     <View
         android:id="@+id/caretaker_info_divider"
-        android:layout_below="@id/caretaker_info_linear_layout"
+        android:layout_below="@id/profile_info_linear_layout"
         android:layout_width="match_parent"
         android:background="@drawable/full_divider"
         android:layout_height="wrap_content"/>

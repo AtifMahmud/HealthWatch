@@ -31,19 +31,27 @@ public class MealPlanFormAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int TYPE_FOOTER = 2;
 
     private int mItemCount;
+    private String mPatientName;
     private List<String> mMealItems;
 
     /**
+     * @param name name of the patient meal plan is for.
+     *
      * Postcondition: When adding this adapter to recycler view make sure TYPE_HEADER
      * views are never recycled.
      */
-    MealPlanFormAdapter() {
+    MealPlanFormAdapter(String name) {
         // 1 header item, 3 meal edit items and 1  footer item
         mItemCount = 5;
         mMealItems = new ArrayList<>();
         for (int i = 0; i < mItemCount - 2; i++) {
             mMealItems.add("");
         }
+        mPatientName = name;
+    }
+
+    public String getPatientName() {
+        return mPatientName;
     }
 
     /**
@@ -160,18 +168,21 @@ public class MealPlanFormAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView mNameText;
         EditText mEditText;
         TimePicker mTimePicker;
-        TextView mTextView;
+        TextView mHeaderTextView;
         HeaderViewHolder(View view) {
             super(view);
+            mNameText = view.findViewById(R.id.meal_plan_patient_name);
             mEditText = view.findViewById(R.id.input_meal_name);
             mTimePicker = view.findViewById(R.id.time_picker);
-            mTextView = view.findViewById(R.id.header);
+            mHeaderTextView = view.findViewById(R.id.header);
         }
 
         void bind() {
-            mTextView.setText(R.string.meal_edit_list_header);
+            mNameText.setText(String.format(Locale.CANADA, "%s's", mPatientName));
+            mHeaderTextView.setText(R.string.meal_edit_list_header);
         }
     }
 
