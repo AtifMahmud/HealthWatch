@@ -38,7 +38,6 @@ public class BluetoothService extends Service {
     // UUID for connecting to RN-42 bluetooth dongle.
     private static final UUID RN_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-
     private BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
@@ -145,7 +144,7 @@ public class BluetoothService extends Service {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInputStream;
 
-        public ConnectedThread(BluetoothSocket socket) {
+        ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream is = null;
             try {
@@ -181,7 +180,7 @@ public class BluetoothService extends Service {
             }
         }
 
-        public void cancel() {
+        void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) {
@@ -197,7 +196,7 @@ public class BluetoothService extends Service {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
-        public ConnectThread(String macAddr) {
+        ConnectThread(String macAddr) {
             mmDevice = mAdapter.getRemoteDevice(macAddr);
             BluetoothSocket socket = null;
             try {
@@ -229,7 +228,7 @@ public class BluetoothService extends Service {
             message.sendToTarget();
         }
 
-        public void cancel() {
+        void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e2) {

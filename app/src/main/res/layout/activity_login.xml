@@ -3,7 +3,6 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="@color/colorPrimary"
             android:fitsSystemWindows="true">
 
     <LinearLayout
@@ -22,7 +21,7 @@
             android:src="@drawable/logo"
             android:contentDescription="@string/login_logo_image_desc"/>
 
-        <!-- Email Label -->
+        <!-- Username Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,8 +32,8 @@
                 android:id="@+id/input_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/username"
-                android:inputType="textEmailAddress"/>
+                android:inputType="textCapWords"
+                android:hint="@string/username"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
