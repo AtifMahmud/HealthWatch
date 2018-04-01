@@ -312,7 +312,6 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
-    // THIS IS WHERE WE START. SO MODIFY THIS TO GO TO CARETAKER ACTIVITY
     private void setListeners() {
         FloatingActionButton actionButton = findViewById(R.id.btn_profile);
         actionButton.setOnClickListener(new OnClickListener() {
