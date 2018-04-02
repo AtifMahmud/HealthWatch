@@ -106,6 +106,7 @@ public class MapActivity extends FragmentActivity implements
 
     // Timer to periodically pull user locations from the server.
     private Timer mLocationRequestTimer;
+    private Timer notificationRequestTimer;
 
     private List<MarkerInterface> mUserMarkers;
 
@@ -141,6 +142,16 @@ public class MapActivity extends FragmentActivity implements
         }, 0, 5000);
     }
 
+    private void setPeriodicNotificationPulling() {
+        notificationRequestTimer = new Timer();
+        notificationRequestTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getOtherUserLocations();
+            }
+        }, 0, 10000);
+    }
+
     /**
      * Get the location of other users and update it on the map.
      */
@@ -152,6 +163,27 @@ public class MapActivity extends FragmentActivity implements
             @Override
             public void onSuccessResponse(String response) {
                 Log.d(TAG, "Obtained response: " + response);
+                updateOtherUserLocationsOnMap(response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "getting other user location obtained error");
+            }
+        });
+    }
+
+    /**
+     * Get the notifications for the user.
+     */
+    private void getUserNotification() {
+        Log.d(TAG, "Getting user's notifications");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        GlobalFactory.getServerInterface().asyncGet("/gateway/notification/user", headers, new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Notifications, obtained response: " + response);
                 updateOtherUserLocationsOnMap(response);
             }
         }, new ServerErrorCallback() {
