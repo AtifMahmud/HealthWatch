@@ -67,7 +67,7 @@ public class VoiceCommand {
         try {
             JSONObject speechJSON = new JSONObject(response);
             JSONArray resultsJSON = speechJSON.getJSONArray("results");
-            JSONArray alternatives = resultsJSON.getJSONArray(0);
+            JSONArray alternatives = resultsJSON.getJSONObject(0).getJSONArray("alternatives");
             String transcript = alternatives.getJSONObject(0).getString("transcript");
             sendTranscriptToAI(transcript);
         } catch (JSONException e) {
