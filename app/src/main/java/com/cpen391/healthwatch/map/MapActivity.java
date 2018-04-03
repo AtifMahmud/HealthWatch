@@ -1,28 +1,3 @@
-/*
- * This activity will show the locations on the map with custom icons. Before the server is set-up, test
- * with dummy JSON.
- *
- * @author: Atif Mahmud
- * @since: 2018-03-03
- *
- * Sources:
- *      1. https://stackoverflow.com/questions/17810044/android-create-json-array-and-json-object
- *      2. https://developers.google.com/android/reference/com/google/android/gms/maps/model/LatLng
- *      3. https://stackoverflow.com/questions/28736419/parsing-json-array-and-object-in-android
- *      4. https://stackoverflow.com/questions/1520887/how-to-pause-sleep-thread-or-process-in-android
- *      5. https://stackoverflow.com/questions/18486503/android-google-maps-api-v2-how-to-change-marker-icon
- *      6. https://stackoverflow.com/questions/29983733/adding-new-markers-on-map-using-cluster-manager-doesnt-reflect-the-changes-unti
- *
- * FOR REFERENCE:
- *       {
- *           "type": String (either "hospital" or "ambulance")
- *           "latitude": int    // North
- *           "longitude":int    // East
- *           "place":  String
- *       }
- *
- */
-
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;
@@ -47,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import com.cpen391.healthwatch.caretaker.CareTakerActivity;
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog;
@@ -61,6 +37,7 @@ import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
+import com.cpen391.healthwatch.user.UserSessionInterface;
 import com.cpen391.healthwatch.util.Callback;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -246,6 +223,7 @@ public class MapActivity extends FragmentActivity implements
                 public void onPositiveClick() {
                     checkBluetooth();
                 }
+
                 @Override
                 public void onNegativeClick() {
                     Toast.makeText(getApplicationContext(),
@@ -334,12 +312,20 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    // THIS IS WHERE WE START. SO MODIFY THIS TO GO TO CARETAKER ACTIVITY
     private void setListeners() {
         FloatingActionButton actionButton = findViewById(R.id.btn_profile);
         actionButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MapActivity.this, PatientActivity.class);
+                Intent intent;
+                switch (GlobalFactory.getUserSessionInterface().getUserType()) {
+                    case UserSessionInterface.CARETAKER:
+                        intent = new Intent(MapActivity.this, CareTakerActivity.class);
+                        break;
+                    default:
+                        intent = new Intent(MapActivity.this, PatientActivity.class);
+                }
                 startActivity(intent);
             }
         });
@@ -444,6 +430,7 @@ public class MapActivity extends FragmentActivity implements
 
     /**
      * Updates the map to display only the new markers.
+     *
      * @param newIconMarkers the new list of markers to display.
      */
     private void updateMapMarkers(List<IconMarker> newIconMarkers) {
@@ -560,8 +547,7 @@ public class MapActivity extends FragmentActivity implements
      * Convert the json object received from the server to the json object used to create the marker.
      *
      * @param serverIconJson the icon json object returned by the server.
-     * Adds a marker onto the map.
-     *
+     *                       Adds a marker onto the map.
      * @return the json object required to create the marker.
      */
     private JSONObject convertIconJSON(JSONObject serverIconJson) {
@@ -626,7 +612,7 @@ public class MapActivity extends FragmentActivity implements
      */
     private void createLocationRequest() {
         Log.d(TAG, "create location request");
-        mLocationRequest = new LocationRequest();
+        mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -677,8 +663,7 @@ public class MapActivity extends FragmentActivity implements
     }
 
     /**
-     *
-     * @param geoPoint one of the geo points.
+     * @param geoPoint      one of the geo points.
      * @param otherGeoPoint the other geo point.
      * @return the distance between two geo points.
      */

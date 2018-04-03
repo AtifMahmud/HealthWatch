@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/content_profile_info"/>
+
+    <TextView
+        android:id="@+id/BPM"
+        android:layout_below="@id/profile_info_linear_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="23dp"
+        android:text="@string/default_bpm_message"
+        android:textSize="30sp" />
+
+</RelativeLayout>

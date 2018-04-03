@@ -7,6 +7,9 @@ import android.content.Context;
  * Keeps track of any session state of the app, for instance user logged in state, etc.
  */
 public interface UserSessionInterface {
+    String CARETAKER = "caretaker";
+    String PATIENT = "patient";
+
     /**
      *
      * @return true if there is a user is logged in, false otherwise.

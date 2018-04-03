@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">HealthWatch</string>
 
+    <string name="title_activity_care_taker">CareTakerActivity</string>
+
     <string name="title_activity_custom_icon_maps">Map</string>
     <string name="title_activity_patient">PatientActivity</string>
     <string name="password">Password</string>
@@ -10,7 +12,7 @@
     <string name="username">Username</string>
     <string name="sign_up_logo_image_desc">Sign Up Image Logo</string>
     <string name="login_logo_image_desc">Login Image Logo</string>
-    <string name="alpha_num_sequence">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
+    <string name="phone_number">Phone Number</string>
     <string name="login">Login</string>
     <string name="create_account_option">No account yet? Create one</string>
 
@@ -20,6 +22,8 @@
     <string name="sign_up_user_type_option">Register as caretaker</string>
     <string name="caretaker_key">Caretaker Key</string>
     <string name="patient_image_desc">Patient Image Desc</string>
+
+    <string name="title_activity_meal_plan">MealPlanActivity</string>
     <string name="healthwatch_bt_address">healthwatch.bt.address</string>
 
     <string name="dialog_use_bluetooth">Do you want to use bluetooth to pair with a HealthWatch device?</string>
@@ -30,4 +34,23 @@
     <string name="health_watch">HealthWatch2</string>
 
     <string name="default_bpm_message">HealthWatch Not Connected</string>
+    <string name="patients_list_header">Patients</string>
+
+    <string name="patient_meal_plan_edit_image_view_desc">PatientMealPlanEditImageViewDesc</string>
+    <string name="action_done">Done</string>
+
+    <string name="meal_edit_title">Meal Form</string>
+    <string name="meal_name">Meal Name</string>
+
+    <string name="meal_edit_footer_image_view_desc">MealEditFooterImageViewDesc</string>
+    <string name="meal_edit_list_header">Meal Items</string>
+
+    <string name="dialog_confirm_unsaved">Leave without submitting?</string>
+    <string name="leave">Leave</string>
+    <string name="stay">Stay</string>
+
+    <string name="dialog_confirm_fields">Confirm submission?</string>
+    <string name="mobile">Mobile</string>
+
+    <string name="profile_phone_image_desc">CareTakerPhoneImageDesc</string>
 </resources>

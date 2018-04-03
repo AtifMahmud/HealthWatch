@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/colorPrimary"
     android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -34,9 +33,8 @@
                 android:id="@+id/input_username"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:digits="@string/alpha_num_sequence"
                 android:hint="@string/username"
-                android:inputType="textCapCharacters"
+                android:inputType="textCapWords"
                 android:maxLength="@integer/max_username_length"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -72,6 +70,22 @@
                 android:maxLength="@integer/max_password_length"/>
         </android.support.design.widget.TextInputLayout>
 
+        <!-- Phone Number Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/input_phone"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/phone_number"
+                android:lines="1"
+                android:maxLength="14"
+                android:inputType="phone"/>
+        </android.support.design.widget.TextInputLayout>
 
         <CheckBox
             android:id="@+id/caretaker_checkbox"
