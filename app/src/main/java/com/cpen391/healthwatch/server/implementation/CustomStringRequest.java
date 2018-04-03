@@ -67,4 +67,5 @@ public class CustomStringRequest extends StringRequest {
     public Map<String, String> getHeaders() throws AuthFailureError {
         return (mHeaders != null) ? mHeaders : super.getHeaders();
     }
+
 }

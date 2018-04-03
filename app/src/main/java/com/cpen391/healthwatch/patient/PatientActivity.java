@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,9 @@ import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Locale;
 
 public class PatientActivity extends AppCompatActivity {
@@ -95,7 +99,42 @@ public class PatientActivity extends AppCompatActivity {
                     }
                 });
             }
+
+            @Override
+            public void onDataReceived(final byte[] data, int offset, int size) {
+                if (!isExternalStorageWritable()) {
+                    Log.d(TAG, "Unable to write to external storage");
+                    return;
+                }
+                Log.d(TAG, "Writing to file: " + getFilesDir().getAbsolutePath());
+                String filename = "myFile";
+                File dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                if (dir == null) {
+                    Log.e(TAG, "External directory is null");
+                    return;
+                }
+                if (!dir.exists() && !dir.mkdirs()) {
+                    Log.e(TAG, "Directory not created");
+                    return;
+                }
+                File file = new File(dir, filename);
+                try {
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    outputStream.write(data, offset, size);
+                    outputStream.close();
+                    Log.d(TAG, "Completed file write");
+                } catch (IOException e) {
+                    Log.d(TAG, "exception when writing to file");
+                    e.printStackTrace();
+                }
+            }
         });
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     private void setListeners() {
