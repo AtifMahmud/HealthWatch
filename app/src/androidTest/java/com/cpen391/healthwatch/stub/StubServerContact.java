@@ -38,4 +38,9 @@ public class StubServerContact implements ServerInterface {
     public void asyncGet(String path, ServerCallback callback) {
 
     }
+
+    @Override
+    public void asyncPost2(String url, Map<String, String> headers, String body, ServerCallback callback, ServerErrorCallback errorCallback) {
+
+    }
 }
