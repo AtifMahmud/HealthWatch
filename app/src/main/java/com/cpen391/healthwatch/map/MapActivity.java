@@ -200,6 +200,9 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Create notification channel for API level 26
+     */
     private void createNotificationChannel() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             String channelId = "Notifications";
@@ -211,6 +214,9 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Pull for notifications every 10s
+     */
     private void setPeriodicNotificationPulling() {
         notificationRequestTimer = new Timer();
         notificationRequestTimer.schedule(new TimerTask() {
@@ -255,6 +261,9 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Create and display a single notification for the user
+     */
     private void createNotification(String message) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "Notifications")
                 .setSmallIcon(R.drawable.logo)
