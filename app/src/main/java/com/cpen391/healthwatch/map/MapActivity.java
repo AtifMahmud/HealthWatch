@@ -259,7 +259,8 @@ public class MapActivity extends FragmentActivity implements
             for (int i = 0; i < notificationArray.length(); i++) {
                 JSONObject messageObj = notificationArray.getJSONObject(i);
                 String message = messageObj.getString("message");
-                createNotification(message);
+                String fromUser = messageObj.getString("from");
+                createNotification(message, fromUser);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -269,10 +270,10 @@ public class MapActivity extends FragmentActivity implements
     /**
      * Create and display a single notification for the user
      */
-    private void createNotification(String message) {
+    private void createNotification(String message, String fromUser) {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "Notifications")
                 .setSmallIcon(R.drawable.logo)
-                .setContentTitle("Notification")
+                .setContentTitle(fromUser)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
