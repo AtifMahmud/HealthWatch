@@ -35,7 +35,7 @@ public class VoiceCommand {
     /**
      * Process 8-bit audio voice samples.
      *
-     * @param data8bit the 8 bit audio data to be processed.
+     * @param data8bit   the 8 bit audio data to be processed.
      * @param sampleSize the number of 8 bit samples to be processed.
      */
     public void processVoice8bit(byte[] data8bit, int sampleSize) {
@@ -77,6 +77,7 @@ public class VoiceCommand {
 
     /**
      * Sends a message to the ai assistant for processing.
+     *
      * @param transcript the message to send to the ai.
      */
     private void sendTranscriptToAI(String transcript) {
@@ -116,12 +117,38 @@ public class VoiceCommand {
     }
 
     private void executeAction(String action) {
-        switch(action) {
+        switch (action) {
             case "emergency":
                 Log.d(TAG, "executing emergency action");
+                postNotification("I need emergency help");
                 break;
             default:
                 Log.d(TAG, "unknown action!");
+        }
+    }
+
+    private void postNotification(String message) {
+        try {
+            JSONObject notificationObj = new JSONObject()
+                    .put("message", message);
+            String bodyJSON = new JSONObject().put("notification", notificationObj).toString();
+            Map<String, String> headers = new HashMap<>();
+            headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+            GlobalFactory.getServerInterface().asyncPost("/gateway/notification", headers, bodyJSON,
+                    new ServerCallback() {
+                        @Override
+                        public void onSuccessResponse(String response) {
+                            Log.d(TAG, "Successfully posted notification");
+                        }
+                    }, new ServerErrorCallback() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG, "Error posting notification");
+                            error.printStackTrace();
+                        }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -167,7 +194,8 @@ public class VoiceCommand {
 
     /**
      * Convert 8 bit audio data to 16 bit audio data.
-     * @param data8bit the 8 bit audio data to be converted.
+     *
+     * @param data8bit   the 8 bit audio data to be converted.
      * @param sampleSize the number of 8 bit samples in the byte array.
      */
     private byte[] audio8to16bit(byte[] data8bit, int sampleSize) {

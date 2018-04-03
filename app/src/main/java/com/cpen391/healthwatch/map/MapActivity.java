@@ -257,7 +257,8 @@ public class MapActivity extends FragmentActivity implements
             JSONObject notificationObj = new JSONObject(response);
             JSONArray notificationArray = notificationObj.getJSONArray("notification");
             for (int i = 0; i < notificationArray.length(); i++) {
-                String message = notificationArray.getString(i);
+                JSONObject messageObj = notificationArray.getJSONObject(i);
+                String message = messageObj.getString("message");
                 createNotification(message);
             }
         } catch (JSONException e) {
