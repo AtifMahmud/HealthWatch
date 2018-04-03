@@ -16,13 +16,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.bluetooth.BluetoothService;
 import com.cpen391.healthwatch.bluetooth.BluetoothService.OnBluetoothDataListener;
-import com.cpen391.healthwatch.caretaker.PatientListDividerItemDecoration;
 import com.cpen391.healthwatch.user.UserProfileOperator;
 import com.cpen391.healthwatch.user.UserProfileOperator.UserProfileImageListener;
 import com.cpen391.healthwatch.util.BitmapDecodeTask;
@@ -45,7 +44,7 @@ public class PatientActivity extends AppCompatActivity {
     private BluetoothService mBluetoothService;
     private UserProfileOperator mImageUploader;
 
-    private RecyclerView mRecycllerview;
+    private RecyclerView mRecyclerView;
     private PatientProfileAdapter mPatientProfileAdapter;
 
     private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
@@ -96,13 +95,13 @@ public class PatientActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(){
-        mRecycllerview = findViewById(R.id.patient_profile_recycler_view);
+        mRecyclerView = findViewById(R.id.patient_profile_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecycllerview.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
         mPatientProfileAdapter = new PatientProfileAdapter(this);
-        mRecycllerview.setAdapter(mPatientProfileAdapter);
+        mRecyclerView.setAdapter(mPatientProfileAdapter);
         //RecyclerView.ItemDecoration dividerItemDecoration  = new MealListDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
-        //mRecycllerview.addItemDecoration(dividerItemDecoration);
+        //mRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     private void setupBluetoothServiceCallbacks() {

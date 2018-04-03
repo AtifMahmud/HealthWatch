@@ -1,6 +1,8 @@
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -24,12 +26,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-import com.cpen391.healthwatch.caretaker.CareTakerActivity;
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog.OnClickDialogListener;
 import com.cpen391.healthwatch.bluetooth.BluetoothService;
+import com.cpen391.healthwatch.caretaker.CareTakerActivity;
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MapInterface.OnCameraIdleListener;
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
@@ -66,6 +68,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -75,10 +78,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Date;
-
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -161,7 +160,7 @@ public class MapActivity extends FragmentActivity implements
         GlobalFactory.getServerInterface().asyncGet("/gateway/patients/location", headers, new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                //Log.d(TAG, "Obtained response: " + response);
+                Log.d(TAG, "Obtained location response: " + response);
                 updateOtherUserLocationsOnMap(response);
             }
         }, new ServerErrorCallback() {
@@ -198,6 +197,7 @@ public class MapActivity extends FragmentActivity implements
             marker = mMap.addMarker(new MarkerOptions().title(username).snippet(snippet).position(position));
             mUserMarkers.add(marker);
         } else {
+            marker.setSnippet(snippet);
             MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
                     .createMarkerTransitionAnimator(marker, position);
             transitionAnimator.start();
@@ -214,7 +214,9 @@ public class MapActivity extends FragmentActivity implements
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.createNotificationChannel(channel);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
         }
     }
 
@@ -238,7 +240,7 @@ public class MapActivity extends FragmentActivity implements
         Log.d(TAG, "Getting user's notifications");
         Map<String, String> headers = new HashMap<>();
         headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
-        GlobalFactory.getServerInterface().asyncPost("/gateway/notification/user", headers, "", new ServerCallback() {
+        GlobalFactory.getServerInterface().asyncPost("/gateway/notification/user", headers, "{}", new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
                 Log.d(TAG, "Notifications, obtained response: " + response);

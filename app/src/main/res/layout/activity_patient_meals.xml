@@ -20,6 +20,4 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_patient_meals" />
-
 </android.support.design.widget.CoordinatorLayout>
