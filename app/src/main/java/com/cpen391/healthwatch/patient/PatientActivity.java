@@ -42,7 +42,7 @@ public class PatientActivity extends AppCompatActivity {
     private UserProfileOperator mImageUploader;
 
     private RecyclerView mRecycllerview;
-    private MealListAdapter mMealListAdapter;
+    private PatientProfileAdapter mPatientProfileAdapter;
 
     private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
         @Override
@@ -88,14 +88,15 @@ public class PatientActivity extends AppCompatActivity {
         setListeners();
         mImageUploader.setupUserProfileImage(mProfileImage);
         doBindService();
+        setupRecyclerView();
     }
 
     private void setupRecyclerView(){
         mRecycllerview = findViewById(R.id.patient_profile_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecycllerview.setLayoutManager(layoutManager);
-        mMealListAdapter = new MealListAdapter(this);
-        mRecycllerview.setAdapter(mMealListAdapter);
+        mPatientProfileAdapter = new PatientProfileAdapter(this);
+        mRecycllerview.setAdapter(mPatientProfileAdapter);
         //RecyclerView.ItemDecoration dividerItemDecoration  = new MealListDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
         //mRecycllerview.addItemDecoration(dividerItemDecoration);
     }
@@ -107,7 +108,9 @@ public class PatientActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mBPMText.setText(String.format(Locale.CANADA, "%s BPM", data));
+                        if (mBPMText != null) {
+                            mBPMText.setText(String.format(Locale.CANADA, "%s BPM", data));
+                        }
                     }
                 });
             }
