@@ -16,6 +16,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -69,10 +71,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Date;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -107,6 +113,7 @@ public class MapActivity extends FragmentActivity implements
 
     // Timer to periodically pull user locations from the server.
     private Timer mLocationRequestTimer;
+    private Timer notificationRequestTimer;
 
     private List<MarkerInterface> mUserMarkers;
 
@@ -129,6 +136,8 @@ public class MapActivity extends FragmentActivity implements
         createLocationRequest();
         startLocationUpdates();
         setPeriodicLocationPulling();
+        createNotificationChannel();
+        setPeriodicNotificationPulling();
         mUserMarkers = new ArrayList<>();
     }
 
@@ -195,6 +204,83 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Create notification channel for API level 26
+     */
+    private void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String channelId = "Notifications";
+            CharSequence channelName = "Notifications Channel";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    /**
+     * Pull for notifications every 10s
+     */
+    private void setPeriodicNotificationPulling() {
+        notificationRequestTimer = new Timer();
+        notificationRequestTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getUserNotification();
+            }
+        }, 0, 10000);
+    }
+
+    /**
+     * Get the notifications for the user.
+     */
+    private void getUserNotification() {
+        Log.d(TAG, "Getting user's notifications");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        GlobalFactory.getServerInterface().asyncGet("/gateway/notification/user", headers, new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Notifications, obtained response: " + response);
+                displayNotifications(response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "getting user notifications obtained error");
+            }
+        });
+    }
+
+    private void displayNotifications(String response) {
+        try {
+            JSONObject notificationObj = new JSONObject(response);
+            JSONArray notificationArray = notificationObj.getJSONArray("notification");
+            for (int i = 0; i < notificationArray.length(); i++) {
+                String message = notificationArray.getString(i);
+                createNotification(message);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create and display a single notification for the user
+     */
+    private void createNotification(String message) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "Notifications")
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle("Notification")
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        int random = new Random().nextInt(100000);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(random, mBuilder.build());
+    }
+
     private MarkerInterface userInMarkerList(String username) {
         for (MarkerInterface marker : mUserMarkers) {
             if (username.equals(marker.getTitle())) {
@@ -208,6 +294,7 @@ public class MapActivity extends FragmentActivity implements
     public void onDestroy() {
         super.onDestroy();
         mLocationRequestTimer.cancel();
+        notificationRequestTimer.cancel();
 
         stopLocationUpdates();
         stopBluetoothService();
