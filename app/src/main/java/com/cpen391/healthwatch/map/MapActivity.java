@@ -72,6 +72,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Date;
 
 public class MapActivity extends FragmentActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -176,13 +177,16 @@ public class MapActivity extends FragmentActivity implements
 
     private void updateSingleOtherUserOnMap(JSONObject userLocationJSON) throws JSONException {
         String username = userLocationJSON.getString("username");
+        long time = userLocationJSON.getLong("time");
+        Date date = new Date(time);
+        String snippet = "Last updated: " + date;
         JSONObject locationJSON = userLocationJSON.getJSONObject("location");
         double lat = locationJSON.getDouble("lat");
         double lng = locationJSON.getDouble("lng");
         LatLng position = new LatLng(lat, lng);
         MarkerInterface marker = userInMarkerList(username);
         if (marker == null) {
-            marker = mMap.addMarker(new MarkerOptions().title(username).position(position));
+            marker = mMap.addMarker(new MarkerOptions().title(username).snippet(snippet).position(position));
             mUserMarkers.add(marker);
         } else {
             MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
