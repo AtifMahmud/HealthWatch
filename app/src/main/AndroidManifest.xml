@@ -3,6 +3,7 @@
     package="com.cpen391.healthwatch">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
