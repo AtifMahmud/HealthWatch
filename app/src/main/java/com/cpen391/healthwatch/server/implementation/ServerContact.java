@@ -59,9 +59,9 @@ public class ServerContact implements ServerInterface {
     }
 
     @Override
-    public void asyncPost2(String url, String body, ServerCallback callback, ServerErrorCallback errorCallback) {
+    public void asyncPost2(String url, Map<String, String> headers, String body, ServerCallback callback, ServerErrorCallback errorCallback) {
         CustomStringRequest strRequest = new CustomStringRequest(Method.POST, url, callback,
-                errorCallback, null);
+                errorCallback, headers);
         Log.d(TAG, "ServerContact url: " + strRequest.getUrl());
         strRequest.setRequestBody(body);
         mAppControl.addToRequestQueue(strRequest);
