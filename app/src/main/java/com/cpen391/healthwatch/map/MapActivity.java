@@ -238,7 +238,7 @@ public class MapActivity extends FragmentActivity implements
         Log.d(TAG, "Getting user's notifications");
         Map<String, String> headers = new HashMap<>();
         headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
-        GlobalFactory.getServerInterface().asyncGet("/gateway/notification/user", headers, new ServerCallback() {
+        GlobalFactory.getServerInterface().asyncPost("/gateway/notification/user", headers, "", new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
                 Log.d(TAG, "Notifications, obtained response: " + response);
