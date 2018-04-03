@@ -15,6 +15,9 @@ import android.widget.TextView;
 
 import com.cpen391.healthwatch.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +32,16 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private Context mContext;
 
     private List<String> mMealList;
+    private JSONObject meal = new JSONObject();
+    private JSONArray mealList = new JSONArray();
 
     PatientProfileAdapter(Context context) {
         mMealList = new ArrayList<>();
+
+        // Add dummy JSON
         for (String item : new String[]{"Pancakes", "Eggs", "Sausages", "Burgers"}) {
+
+            // PArse and add items
             mMealList.add(item);
         }
 
@@ -56,6 +65,8 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if (holder instanceof MealViewHolder) {
             MealViewHolder vh = (MealViewHolder) holder;
+
+            // Add specific field to specific textview
             vh.mTextView.setText(mMealList.get(position - 1));
         }
     }

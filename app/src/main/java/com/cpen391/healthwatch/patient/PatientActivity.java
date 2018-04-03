@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -97,8 +98,8 @@ public class PatientActivity extends AppCompatActivity {
         mRecycllerview.setLayoutManager(layoutManager);
         mPatientProfileAdapter = new PatientProfileAdapter(this);
         mRecycllerview.setAdapter(mPatientProfileAdapter);
-        //RecyclerView.ItemDecoration dividerItemDecoration  = new MealListDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
-        //mRecycllerview.addItemDecoration(dividerItemDecoration);
+        RecyclerView.ItemDecoration dividerItemDecoration  = new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL);
+        mRecycllerview.addItemDecoration(dividerItemDecoration);
     }
 
     private void setupBluetoothServiceCallbacks() {
