@@ -160,7 +160,7 @@ public class MapActivity extends FragmentActivity implements
         GlobalFactory.getServerInterface().asyncGet("/gateway/patients/location", headers, new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                //Log.d(TAG, "Obtained response: " + response);
+                Log.d(TAG, "Obtained location response: " + response);
                 updateOtherUserLocationsOnMap(response);
             }
         }, new ServerErrorCallback() {
@@ -197,6 +197,7 @@ public class MapActivity extends FragmentActivity implements
             marker = mMap.addMarker(new MarkerOptions().title(username).snippet(snippet).position(position));
             mUserMarkers.add(marker);
         } else {
+            marker.setSnippet(snippet);
             MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
                     .createMarkerTransitionAnimator(marker, position);
             transitionAnimator.start();
@@ -239,7 +240,7 @@ public class MapActivity extends FragmentActivity implements
         Log.d(TAG, "Getting user's notifications");
         Map<String, String> headers = new HashMap<>();
         headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
-        GlobalFactory.getServerInterface().asyncPost("/gateway/notification/user", headers, "", new ServerCallback() {
+        GlobalFactory.getServerInterface().asyncPost("/gateway/notification/user", headers, "{}", new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
                 Log.d(TAG, "Notifications, obtained response: " + response);
