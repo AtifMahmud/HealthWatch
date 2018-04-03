@@ -1,0 +1,5 @@
+<resources>
+    <string name="google_speech_to_text_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyA1dqjo8dP_lzE31WSk-Z_GDKfs_t_rmks
+    </string>
+</resources>

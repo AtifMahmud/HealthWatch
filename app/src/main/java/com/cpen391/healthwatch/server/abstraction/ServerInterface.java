@@ -66,4 +66,13 @@ public interface ServerInterface {
      * @param callback callback to invoke on success.
      */
     void asyncGet(String path, ServerCallback callback);
+
+    /**
+     * Makes a POST request to a server by specifying the complete url.
+     * @param url the url of the server.
+     * @param body the body of the message.
+     * @param callback the callback to invoke on success.
+     * @param errorCallback the callback to invoke on error.
+     */
+    void asyncPost2(String url, String body, ServerCallback callback, ServerErrorCallback errorCallback);
 }

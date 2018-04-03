@@ -6,7 +6,7 @@
 
     https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=45:D9:D0:D8:B4:8B:40:E3:01:01:8A:6C:98:05:43:A4:3B:5B:9E:C3%3Bcom.example.atifm.healthwatch
 
-    You can also add your credentials to an existing key, using these values:
+    You can also add credentialials to an existing key, using these values:
 
     Package name:
     45:D9:D0:D8:B4:8B:40:E3:01:01:8A:6C:98:05:43:A4:3B:5B:9E:C3

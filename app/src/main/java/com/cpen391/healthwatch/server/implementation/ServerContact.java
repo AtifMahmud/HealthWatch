@@ -1,5 +1,7 @@
 package com.cpen391.healthwatch.server.implementation;
 
+import android.util.Log;
+
 import com.android.volley.Request.Method;
 import com.cpen391.healthwatch.server.abstraction.AppControlInterface;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ServerContact implements ServerInterface {
+    private static final String TAG = ServerContact.class.getSimpleName();
 
     private final AppControlInterface mAppControl;
 
@@ -53,5 +56,14 @@ public class ServerContact implements ServerInterface {
     @Override
     public void asyncGet(String path, ServerCallback callback) {
         asyncGet(path, null, callback, null);
+    }
+
+    @Override
+    public void asyncPost2(String url, String body, ServerCallback callback, ServerErrorCallback errorCallback) {
+        CustomStringRequest strRequest = new CustomStringRequest(Method.POST, url, callback,
+                errorCallback, null);
+        Log.d(TAG, "ServerContact url: " + strRequest.getUrl());
+        strRequest.setRequestBody(body);
+        mAppControl.addToRequestQueue(strRequest);
     }
 }
