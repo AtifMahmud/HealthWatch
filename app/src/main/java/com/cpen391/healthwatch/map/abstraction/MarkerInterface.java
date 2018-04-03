@@ -63,4 +63,9 @@ public interface MarkerInterface {
      * @param resId resource id of the image to set marker to.
      */
     void setIcon(int resId);
+
+    /**
+     * Gets the title of the marker.
+     */
+    String getTitle();
 }

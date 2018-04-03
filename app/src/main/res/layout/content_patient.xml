@@ -6,13 +6,9 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:id="@+id/BPM"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="23dp"
-        android:text="75 BPM"
-        android:textSize="30sp" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/patient_profile_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </android.support.v4.widget.NestedScrollView>
