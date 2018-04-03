@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -38,6 +39,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".user.SignUpActivity" />
+        <activity android:name=".user.LoginActivity" />
+
         <activity
             android:name=".caretaker.CareTakerActivity"
             android:label="@string/title_activity_care_taker"
@@ -48,6 +52,7 @@
         <service
             android:name=".bluetooth.BluetoothService"
             android:exported="false" />
+
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -80,9 +85,15 @@
         </provider>
 
         <activity
+
+            android:name=".patient.PatientMeals"
+            android:label="@string/title_activity_patient_meals"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
             android:name=".mealplan.MealPlanActivity"/>
         <activity android:name=".patient.PatientProfileActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
+
     </application>
 
 </manifest>

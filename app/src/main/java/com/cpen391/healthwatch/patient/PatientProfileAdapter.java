@@ -15,6 +15,9 @@ import android.widget.TextView;
 
 import com.cpen391.healthwatch.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by william on 2018/3/29.
  *
@@ -22,9 +25,17 @@ import com.cpen391.healthwatch.R;
 
 public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static final int TYPE_HEADER = 0;
+    static final int TYPE_MEAL_ITEM = 1;
     private Context mContext;
 
+    private List<String> mMealList;
+
     PatientProfileAdapter(Context context) {
+        mMealList = new ArrayList<>();
+        for (String item : new String[]{"Pancakes", "Eggs", "Sausages", "Burgers"}) {
+            mMealList.add(item);
+        }
+
         mContext = context;
     }
 
@@ -32,25 +43,34 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.caretaker_page_header, parent, false);
+            View v = LayoutInflater.from(mContext).inflate(R.layout.caretaker_page_header, parent, false);
             return new HeaderViewHolder(v);
+        } else if (viewType == TYPE_MEAL_ITEM) {
+            View v = LayoutInflater.from(mContext).inflate(R.layout.list_meal_item, parent, false);
+            return new MealViewHolder(v);
         }
         throw new IllegalArgumentException("Other views doesn't exist");
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+        if (holder instanceof MealViewHolder) {
+            MealViewHolder vh = (MealViewHolder) holder;
+            vh.mTextView.setText(mMealList.get(position - 1));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return 1;
+        return 1 + mMealList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return TYPE_HEADER;
+        if (position == 0) {
+            return TYPE_HEADER;
+        }
+        return TYPE_MEAL_ITEM;
     }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -72,6 +92,14 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     }
                 }
             });
+        }
+    }
+
+    class MealViewHolder extends RecyclerView.ViewHolder {
+        TextView mTextView;
+        MealViewHolder(View view) {
+            super(view);
+            mTextView = view.findViewById(R.id.meal_item);
         }
     }
 }

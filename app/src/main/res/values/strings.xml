@@ -23,6 +23,9 @@
     <string name="caretaker_key">Caretaker Key</string>
     <string name="patient_image_desc">Patient Image Desc</string>
 
+    <string name="title_activity_patient_meals">PatientMeals</string>
+
+
     <string name="title_activity_meal_plan">MealPlanActivity</string>
     <string name="healthwatch_bt_address">healthwatch.bt.address</string>
 
@@ -53,4 +56,5 @@
     <string name="mobile">Mobile</string>
 
     <string name="profile_phone_image_desc">CareTakerPhoneImageDesc</string>
+
 </resources>
