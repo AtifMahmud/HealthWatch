@@ -55,6 +55,17 @@
     <string name="dialog_confirm_fields">Confirm submission?</string>
     <string name="mobile">Mobile</string>
 
-    <string name="profile_phone_image_desc">CareTakerPhoneImageDesc</string>
+    <string name="bpm_max">Maximum BPM</string>
+    <string name="bpm_max_time">Maximum BPM Time </string>
+
+    <string name="bpm_min">Minimum BPM</string>
+    <string name="bpm_min_time">Minimum BPM Time </string>
+
+    <string name="bpm_most_recent">Most Recent BPM</string>
+    <string name="bpm_most_recent_time">Most Recent BPM Time </string>
+
+    <string name="profile_phone_image_desc"> Profile Phone </string>
+
+
 
 </resources>
