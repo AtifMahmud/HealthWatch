@@ -14,13 +14,12 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
+import com.cpen391.healthwatch.signal.VAD;
+import com.cpen391.healthwatch.voice.VoiceCommand;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.UUID;
-
-import kotlin.text.Charsets;
 
 /**
  * References: google's Bluetooth Chat example.
@@ -29,6 +28,7 @@ public class BluetoothService extends Service {
 
     public interface OnBluetoothDataListener {
         void onDataReceived(String data);
+        void onDataReceived(byte[] data, int offset, int size);
     }
     public static final String BLUETOOTH_ADDRESS = "BT_ADDR";
     public static final int CONNECT_FAILED = 1;
@@ -38,11 +38,16 @@ public class BluetoothService extends Service {
     // UUID for connecting to RN-42 bluetooth dongle.
     private static final UUID RN_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    private VAD mVAD;
+    private VoiceCommand mVoiceCommand;
+
     private BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private String mHealthWatchAddress;
     private OnBluetoothDataListener mListener;
+
+    private BluetoothPacket mBluetoothPacket;
 
     private boolean mEndingService;
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
@@ -65,6 +70,13 @@ public class BluetoothService extends Service {
         public BluetoothService getService() {
             return BluetoothService.this;
         }
+    }
+
+    @Override
+    public void onCreate() {
+        mVoiceCommand = new VoiceCommand(getApplicationContext(), BluetoothPacket.AUDIO_SAMPLE_RATE);
+        mBluetoothPacket = new BluetoothPacket();
+        mVAD = new VAD(5000, BluetoothPacket.AUDIO_SAMPLE_RATE);
     }
 
     @Nullable
@@ -127,6 +139,11 @@ public class BluetoothService extends Service {
         }
     }
 
+    public synchronized void sendReceivedData(byte[] data, int offset, int size) {
+        if (mListener != null) {
+            mListener.onDataReceived(data, offset, size);
+        }
+    }
 
     /**
      * Indicate that the connection was lost and notify the UI Activity.
@@ -159,19 +176,22 @@ public class BluetoothService extends Service {
         @Override
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
-            byte[] buffer = new byte[1024];
-            int bytes;
-            BufferedReader br = new BufferedReader(new InputStreamReader(mmInputStream, Charsets.US_ASCII));
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
-                    // Read from the InputStream
-                    //bytes = mmInputStream.read(buffer);
-                    String data = br.readLine();
-                    sendReceivedData(data);
-                    // Send the obtained bytes to the UI Activity
-                    Log.d(TAG,"obtained: " + data);
+                    mBluetoothPacket.readData(mmInputStream);
+                    if (mBluetoothPacket.getAudioLength() >= 5) {
+                        int audioSampleSize = mBluetoothPacket.getAudioSampleSize();
+                        byte[] samples = mBluetoothPacket.getAudioSamples();
+                        mBluetoothPacket.clearAudioBuffer();
+                        Log.d(TAG," Sending voice to VAD");
+                        boolean isSpeech = mVAD.vad(samples);
+                        Log.d(TAG, "speech detected: " + isSpeech);
+                        if (isSpeech) {
+                            mVoiceCommand.processVoice8bit(samples, audioSampleSize);
+                        }
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     onConnectionLost();
@@ -226,6 +246,7 @@ public class BluetoothService extends Service {
             Log.e(TAG, "Cannot connect to HealthWatch");
             Message message = mHandler.obtainMessage(CONNECT_FAILED, "Cannot connect to healthwatch device");
             message.sendToTarget();
+            Log.e(TAG, "Retrying connection to HealthWatch");
         }
 
         void cancel() {

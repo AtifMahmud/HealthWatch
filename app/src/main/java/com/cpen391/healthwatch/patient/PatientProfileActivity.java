@@ -52,7 +52,6 @@ public class PatientProfileActivity extends AppCompatActivity {
         mImageOperator = new UserProfileOperator();
         mProfileImage = findViewById(R.id.image_cover);
         getPatientInfoFromServer();
-
     }
 
     private void getPatientInfoFromServer() {

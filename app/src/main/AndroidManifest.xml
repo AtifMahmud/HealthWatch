@@ -3,6 +3,7 @@
     package="com.cpen391.healthwatch">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <!--
@@ -81,15 +82,10 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider>
+        </provider><![CDATA[
 
-        <activity
-
-            android:name=".patient.PatientMeals"
-            android:label="@string/title_activity_patient_meals"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
-            android:name=".mealplan.MealPlanActivity"/>
+        android:name=".mealplan.MealPlanActivity"/>
+        ]]>
         <activity android:name=".patient.PatientProfileActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
 

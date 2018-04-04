@@ -6,11 +6,13 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cpen391.healthwatch.R;
@@ -29,61 +31,59 @@ import java.util.List;
 
 public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static final int TYPE_HEADER = 0;
-    static final int TYPE_MEAL_ITEM = 1;
+    private static final int TYPE_MEAL_ITEM = 1;
     private Context mContext;
+    private HeaderViewHolder mHeaderViewHolder;
 
-    private JSONObject breakfast = new JSONObject();
-    private JSONObject lunch = new JSONObject();
-    private JSONObject dinner = new JSONObject();
-    private JSONArray mealList = new JSONArray();
+    private List<JSONObject> mMealList;
+
+    private JSONObject getTestMeal(String title, String time, List<String> items) {
+        JSONObject meal = new JSONObject();
+        try {
+            meal.put("title", title);
+            meal.put("time", time);
+            JSONArray temp = new JSONArray(items);
+            meal.put("items", temp);
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+        return meal;
+    }
 
     PatientProfileAdapter(Context context) {
-
-        try {
-            // Add dummy JSON
-            breakfast.put("title", "Breakfast");
-            breakfast.put("time", "9");
-            breakfast.put("item1", "Oatmeal with skim milk and strawberries");
-            breakfast.put("item2", "2 Boiled Eggs");
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
-
-
-        try {
-            // Add dummy JSON
-            lunch.put("title", "Lunch");
-            lunch.put("time", "12");
-            lunch.put("item1", "Caesar Salad");
-            lunch.put("item2", "Grilled Chicken");
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
-
-
-        try {
-            // Add dummy JSON
-            dinner.put("title", "Dinner");
-            dinner.put("time", "5");
-            dinner.put("item1", "Spaghetti");
-            dinner.put("item2", "250gm Beef Steak");
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
-
-        mealList.put(breakfast);
-        mealList.put(lunch);
-        mealList.put(dinner);
-
+        mMealList = new ArrayList<>();
         mContext = context;
+
+        List<String> items = new ArrayList<>();
+        items.add("Caesar Salad");
+        items.add("Grilled Chicken");
+        JSONObject meal = getTestMeal("Lunch", "12:00 PM", items);
+
+        mMealList.add(meal);
+
+        List<String> items2 = new ArrayList<>();
+        items2.add("Chips");
+        items2.add("Coke");
+        items2.add("Soda");
+        items2.add("Candy");
+        JSONObject meal2 = getTestMeal("Dinner", "7:00 PM", items2);
+
+        mMealList.add(meal2);
+    }
+
+    void setPatientBPM(String bpm) {
+        if (mHeaderViewHolder != null) {
+            Log.d("PatientProfileAdapter", "Not implemented");
+        }
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            View v = LayoutInflater.from(mContext).inflate(R.layout.caretaker_page_header, parent, false);
-            return new HeaderViewHolder(v);
+            View v = LayoutInflater.from(mContext).inflate(R.layout.list_patient_profile_header, parent, false);
+            mHeaderViewHolder = new HeaderViewHolder(v);
+            return mHeaderViewHolder;
         } else if (viewType == TYPE_MEAL_ITEM) {
             View v = LayoutInflater.from(mContext).inflate(R.layout.list_meal_item, parent, false);
             return new MealViewHolder(v);
@@ -95,21 +95,13 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if (holder instanceof MealViewHolder) {
             MealViewHolder vh = (MealViewHolder) holder;
-            try {
-                JSONObject meal = mealList.getJSONObject(position - 1);
-                vh.mTitle.setText(meal.getString("title"));
-                vh.mTime.setText(meal.getString("time"));
-                vh.mItem1.setText(meal.getString("item1"));
-                vh.mItem2.setText(meal.getString("item2"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            vh.bind(mMealList.get(position - 1));
         }
     }
 
     @Override
     public int getItemCount() {
-        return 1 + mealList.length();
+        return 1 + mMealList.size();
     }
 
     @Override
@@ -123,10 +115,15 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     class HeaderViewHolder extends RecyclerView.ViewHolder {
         ImageView mProfilePhoneIcon;
         TextView mProfilePhoneNumber;
+        TextView mHeaderText;
+
         HeaderViewHolder(View view) {
             super(view);
             mProfilePhoneNumber = view.findViewById(R.id.profile_phone_number);
             mProfilePhoneIcon = view.findViewById(R.id.profile_phone_icon);
+            mHeaderText = view.findViewById(R.id.header);
+
+            mHeaderText.setText(R.string.meal_list_header);
             mProfilePhoneIcon.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -140,20 +137,35 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             });
         }
+
     }
 
     class MealViewHolder extends RecyclerView.ViewHolder {
         TextView mTitle;
         TextView mTime;
-        TextView mItem1;
-        TextView mItem2;
+        LinearLayout mLinearLayout;
 
         MealViewHolder(View view) {
             super(view);
             mTitle = view.findViewById(R.id.meal_title);
             mTime = view.findViewById(R.id.meal_time);
-            mItem1 = view.findViewById(R.id.meal_item1);
-            mItem2 = view.findViewById(R.id.meal_item2);
+            mLinearLayout = view.findViewById(R.id.meal_layout);
+        }
+
+        void bind(JSONObject meal) {
+            try {
+                mTitle.setText(meal.getString("title"));
+                mTime.setText(meal.getString("time"));
+                JSONArray mealItems = meal.getJSONArray("items");
+                for (int i = 0; i < mealItems.length(); i++) {
+                    TextView tv = (TextView) LayoutInflater.from(mContext)
+                            .inflate(R.layout.single_meal_item, (ViewGroup) itemView, false);
+                    tv.setText(mealItems.getString(i));
+                    mLinearLayout.addView(tv);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
