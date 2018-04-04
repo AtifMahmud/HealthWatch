@@ -57,4 +57,21 @@ public class MaxMinHandlerTest {
         assertEquals(minBPM, mMaxMinHandler.getMin());
 
     }
+
+    @Test
+    public void testMinBPMTime(){
+        String minBPM = "50";
+        String recentBPM = "60";
+        String maxBPM = "100";
+
+        long minBPMtime = 1000;
+        long maxBPMtime = 1000;
+        long recentBPMtime = 1000;
+
+
+        mMaxMinHandler.update("40", 1500);
+        assertEquals("40", mMaxMinHandler.getMin());
+
+    }
+
 }
