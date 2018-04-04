@@ -97,6 +97,7 @@ public class UserProfileOperator {
                     Log.d(TAG, "Image deleted");
                 }
             }
+            mCurrentPhotoPath = null;
         }
     }
 

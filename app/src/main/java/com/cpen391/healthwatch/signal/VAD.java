@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Created by william on 2018-04-01.
- * This class provides methods to detect voice in a audio sample.
+ * This class provides methods to detect voice in 8-bit audio samples.
  * The main algorithm is based on the following paper.
  * References: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.176.6740&rep=rep1&type=pdf
  */
@@ -165,7 +165,7 @@ public class VAD {
         }
         mFFT.fft(x, y);
         // FFT applied over real numbers result in symmetrical results so we only
-        // need to have have the size for p.
+        // need to have half the size for p.
         double[] p = new double[frame.size() / 2];
         for (int i = 0; i < p.length; i++) {
             p[i] = x[i + p.length] * x[i + p.length] + y[i + p.length] * y[i + p.length];
