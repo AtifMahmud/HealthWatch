@@ -1,6 +1,8 @@
 package com.cpen391.healthwatch.map;
 
 import android.Manifest.permission;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -16,18 +18,20 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
-import com.cpen391.healthwatch.caretaker.CareTakerActivity;
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog;
 import com.cpen391.healthwatch.bluetooth.BluetoothDialog.OnClickDialogListener;
 import com.cpen391.healthwatch.bluetooth.BluetoothService;
+import com.cpen391.healthwatch.caretaker.CareTakerActivity;
 import com.cpen391.healthwatch.map.abstraction.MapInterface;
 import com.cpen391.healthwatch.map.abstraction.MapInterface.OnCameraIdleListener;
 import com.cpen391.healthwatch.map.abstraction.MarkerInterface;
@@ -35,6 +39,7 @@ import com.cpen391.healthwatch.map.implementation.CustomGoogleMap;
 import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
+import com.cpen391.healthwatch.patient.ProfileHeaderIconClickOperator;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserSessionInterface;
@@ -64,11 +69,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -80,6 +87,9 @@ public class MapActivity extends FragmentActivity implements
     private final int REQUEST_ENABLE_BLUETOOTH = 2;
     private final int REQUEST_BLUETOOTH_SETTINGS = 3;
     private final int REQUEST_CHECK_LOCATION_SETTINGS = 4;
+    private final int REQUEST_PATIENT_ACTIVITY = 5;
+
+    private final float MARKER_DISPLAY_ZOOM_LEVEL = 15.0f;
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
@@ -106,6 +116,7 @@ public class MapActivity extends FragmentActivity implements
 
     // Timer to periodically pull user locations from the server.
     private Timer mLocationRequestTimer;
+    private Timer notificationRequestTimer;
 
     private List<MarkerInterface> mUserMarkers;
 
@@ -128,6 +139,8 @@ public class MapActivity extends FragmentActivity implements
         createLocationRequest();
         startLocationUpdates();
         setPeriodicLocationPulling();
+        createNotificationChannel();
+        setPeriodicNotificationPulling();
         mUserMarkers = new ArrayList<>();
     }
 
@@ -145,13 +158,13 @@ public class MapActivity extends FragmentActivity implements
      * Get the location of other users and update it on the map.
      */
     private void getOtherUserLocations() {
-        Log.d(TAG, "Getting other user location");
+        //Log.d(TAG, "Getting other user location");
         Map<String, String> headers = new HashMap<>();
         headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
         GlobalFactory.getServerInterface().asyncGet("/gateway/patients/location", headers, new ServerCallback() {
             @Override
             public void onSuccessResponse(String response) {
-                Log.d(TAG, "Obtained response: " + response);
+                Log.d(TAG, "Obtained location response: " + response);
                 updateOtherUserLocationsOnMap(response);
             }
         }, new ServerErrorCallback() {
@@ -176,19 +189,104 @@ public class MapActivity extends FragmentActivity implements
 
     private void updateSingleOtherUserOnMap(JSONObject userLocationJSON) throws JSONException {
         String username = userLocationJSON.getString("username");
+        long time = userLocationJSON.getLong("time");
+        Date date = new Date(time);
+        String snippet = "Last updated: " + date;
         JSONObject locationJSON = userLocationJSON.getJSONObject("location");
         double lat = locationJSON.getDouble("lat");
         double lng = locationJSON.getDouble("lng");
         LatLng position = new LatLng(lat, lng);
         MarkerInterface marker = userInMarkerList(username);
         if (marker == null) {
-            marker = mMap.addMarker(new MarkerOptions().title(username).position(position));
+            marker = mMap.addMarker(new MarkerOptions().title(username).snippet(snippet).position(position));
             mUserMarkers.add(marker);
         } else {
+            marker.setSnippet(snippet);
             MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
                     .createMarkerTransitionAnimator(marker, position);
             transitionAnimator.start();
         }
+    }
+
+    /**
+     * Create notification channel for API level 26
+     */
+    private void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String channelId = "Notifications";
+            CharSequence channelName = "Notifications Channel";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    /**
+     * Pull for notifications every 10s
+     */
+    private void setPeriodicNotificationPulling() {
+        notificationRequestTimer = new Timer();
+        notificationRequestTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getUserNotification();
+            }
+        }, 0, 10000);
+    }
+
+    /**
+     * Get the notifications for the user.
+     */
+    private void getUserNotification() {
+        Log.d(TAG, "Getting user's notifications");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        GlobalFactory.getServerInterface().asyncPost("/gateway/notification/user", headers, "{}", new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Notifications, obtained response: " + response);
+                displayNotifications(response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "getting user notifications obtained error");
+            }
+        });
+    }
+
+    private void displayNotifications(String response) {
+        try {
+            JSONObject notificationObj = new JSONObject(response);
+            JSONArray notificationArray = notificationObj.getJSONArray("notification");
+            for (int i = 0; i < notificationArray.length(); i++) {
+                JSONObject messageObj = notificationArray.getJSONObject(i);
+                String message = messageObj.getString("message");
+                String fromUser = messageObj.getString("from");
+                createNotification(message, fromUser);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create and display a single notification for the user
+     */
+    private void createNotification(String message, String fromUser) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "Notifications")
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(fromUser)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        int random = new Random().nextInt(100000);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(random, mBuilder.build());
     }
 
     private MarkerInterface userInMarkerList(String username) {
@@ -204,6 +302,7 @@ public class MapActivity extends FragmentActivity implements
     public void onDestroy() {
         super.onDestroy();
         mLocationRequestTimer.cancel();
+        notificationRequestTimer.cancel();
 
         stopLocationUpdates();
         stopBluetoothService();
@@ -275,6 +374,35 @@ public class MapActivity extends FragmentActivity implements
             } else {
                 Toast.makeText(this, "Location update disabled", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == REQUEST_PATIENT_ACTIVITY) {
+            if (resultCode == ProfileHeaderIconClickOperator.LOCATION_ICON_CLICK) {
+                String username = data.getStringExtra("username");
+                animateToUserLocation(username);
+            }
+        }
+    }
+
+    private void animateToUserLocation(String username) {
+        Log.d(TAG, "Animating to " + username + "'s location");
+        LatLng position = null;
+        if (GlobalFactory.getUserSessionInterface().getUsername().equals(username)) {
+            Location loc = getLastBestLocation();
+            Log.d(TAG, "Last location: " + loc);
+            if (loc != null) {
+                position = new LatLng(loc.getLatitude(), loc.getLongitude());
+            }
+        } else {
+            for (MarkerInterface userMarker : mUserMarkers) {
+                if (userMarker.getTitle().equals(username)) {
+                    position = userMarker.getPosition();
+                    break;
+                }
+            }
+        }
+        if (position != null) {
+            mMap.animateCamera(position.latitude, position.longitude, MARKER_DISPLAY_ZOOM_LEVEL);
+        } else {
+            Log.d(TAG, "User location not found");
         }
     }
 
@@ -312,7 +440,6 @@ public class MapActivity extends FragmentActivity implements
         }
     }
 
-    // THIS IS WHERE WE START. SO MODIFY THIS TO GO TO CARETAKER ACTIVITY
     private void setListeners() {
         FloatingActionButton actionButton = findViewById(R.id.btn_profile);
         actionButton.setOnClickListener(new OnClickListener() {
@@ -322,11 +449,13 @@ public class MapActivity extends FragmentActivity implements
                 switch (GlobalFactory.getUserSessionInterface().getUserType()) {
                     case UserSessionInterface.CARETAKER:
                         intent = new Intent(MapActivity.this, CareTakerActivity.class);
+                        startActivity(intent);
                         break;
                     default:
                         intent = new Intent(MapActivity.this, PatientActivity.class);
+                        intent.putExtra("location", getLocationJSON(getLastBestLocation()));
+                        startActivityForResult(intent, REQUEST_PATIENT_ACTIVITY);
                 }
-                startActivity(intent);
             }
         });
         mLocationCallback = new LocationCallback() {
@@ -355,7 +484,7 @@ public class MapActivity extends FragmentActivity implements
                 .asyncPost("/gateway/user/location", jsonLocation, new ServerCallback() {
                     @Override
                     public void onSuccessResponse(String response) {
-                        Log.i(TAG, "User location updated on server");
+                        //Log.i(TAG, "User location updated on server");
                     }
                 });
     }
@@ -410,7 +539,6 @@ public class MapActivity extends FragmentActivity implements
     }
 
     private void checkToUpdateMarkers() {
-        final float MARKER_DISPLAY_ZOOM_LEVEL = 15.0f;
         LatLng currentCenter = mMap.getCameraLocationCenter();
         if (mMap.getCameraZoomLevel() > MARKER_DISPLAY_ZOOM_LEVEL) {
             final double MAX_DEVIATION_DIST = 500;
@@ -495,22 +623,18 @@ public class MapActivity extends FragmentActivity implements
     private Location getLastBestLocation() {
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            long GPSLocationTime = 0;
-            if (null != locationGPS) {
-                GPSLocationTime = locationGPS.getTime();
+            List<String> providers = mLocationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+                Location l = mLocationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
             }
-            long NetLocationTime = 0;
-            if (null != locationNet) {
-                NetLocationTime = locationNet.getTime();
-            }
-            if (0 < GPSLocationTime - NetLocationTime) {
-                return locationGPS;
-            } else {
-                return locationNet;
-            }
+            return bestLocation;
         }
         return null;
     }
@@ -519,6 +643,7 @@ public class MapActivity extends FragmentActivity implements
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
+            Log.d(TAG, "Setting location manager");
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{permission.ACCESS_FINE_LOCATION},

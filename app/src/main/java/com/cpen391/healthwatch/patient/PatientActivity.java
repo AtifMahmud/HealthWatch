@@ -9,40 +9,47 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
 import com.cpen391.healthwatch.bluetooth.BluetoothService;
 import com.cpen391.healthwatch.bluetooth.BluetoothService.OnBluetoothDataListener;
-import com.cpen391.healthwatch.caretaker.PatientListDividerItemDecoration;
+import com.cpen391.healthwatch.patient.PatientProfileAdapter.HeaderViewHolder;
+import com.cpen391.healthwatch.server.abstraction.ServerCallback;
+import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserProfileOperator;
 import com.cpen391.healthwatch.user.UserProfileOperator.UserProfileImageListener;
+import com.cpen391.healthwatch.util.AnimationOperator;
 import com.cpen391.healthwatch.util.BitmapDecodeTask;
 import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
+import com.cpen391.healthwatch.util.LocationMethods;
 
-import java.util.Locale;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PatientActivity extends AppCompatActivity {
     private String TAG = PatientActivity.class.getSimpleName();
 
     private FadeInNetworkImageView mProfileImage;
-    private TextView mBPMText;
 
     private boolean mShouldUnbindBluetooth;
     private BluetoothService mBluetoothService;
-    private UserProfileOperator mImageUploader;
+    private UserProfileOperator mImageOperator;
+    private LocationMethods mLocationOperator;
 
-    private RecyclerView mRecycllerview;
+    private RecyclerView mRecyclerView;
     private PatientProfileAdapter mPatientProfileAdapter;
 
     private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
@@ -80,26 +87,78 @@ public class PatientActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient);
 
-        mImageUploader = new UserProfileOperator();
+        mImageOperator = new UserProfileOperator();
+        mLocationOperator = new LocationMethods(this);
         mProfileImage = findViewById(R.id.image_cover);
-        mBPMText = findViewById(R.id.BPM);
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(GlobalFactory.getUserSessionInterface().getUsername());
         setSupportActionBar(toolbar);
         setListeners();
-        mImageUploader.setupUserProfileImage(mProfileImage);
         doBindService();
         setupRecyclerView();
+        getProfileInfoFromServer();
+        Intent data = getIntent();
+        String locationDataJSON = data.getStringExtra("location");
+        mLocationOperator.setLocationData(locationDataJSON);
+    }
+
+    private void getProfileInfoFromServer() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        GlobalFactory.getServerInterface().asyncGet("/gateway/user", headers, new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Obtained own user profile: " + response);
+                setupUserProfile(response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, "Trying to obtain own user profile obtained error");
+            }
+        });
+    }
+
+    private void setupUserProfile(String response) {
+        try {
+            mImageOperator.getUserProfileImage(response, mProfileImage);
+            JSONObject userObj = new JSONObject(response);
+            JSONObject userDataJSON = userObj.getJSONObject("data");
+            String phoneNumber = userDataJSON.getString("phone");
+            String caretaker = userObj.getJSONArray("caretaker").getString(0);
+            HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
+            vh.mProfilePhoneNumber.setVisibility(View.INVISIBLE);
+            vh.mProfilePhoneNumber.setText(phoneNumber);
+            vh.mProfileCaretakerName.setVisibility(View.INVISIBLE);
+            vh.mProfileCaretakerName.setText(caretaker);
+            vh.mProfileLocationText.setVisibility(View.INVISIBLE);
+            vh.mProfileLocationLabel.setVisibility(View.INVISIBLE);
+            String city = mLocationOperator.getCity();
+            if (city != null) {
+                vh.mProfileLocationText.setText(mLocationOperator.getCity());
+            }
+            String locationUpdateTime = mLocationOperator.getTimeLastUpdated();
+            if (locationUpdateTime != null) {
+                vh.mProfileLocationLabel.setText(locationUpdateTime);
+            }
+            AnimationOperator.fadeInAnimation(vh.mProfilePhoneNumber);
+            AnimationOperator.fadeInAnimation(vh.mProfileCaretakerName);
+            AnimationOperator.fadeInAnimation(vh.mProfileLocationText);
+            AnimationOperator.fadeInAnimation(vh.mProfileLocationLabel);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupRecyclerView(){
-        mRecycllerview = findViewById(R.id.patient_profile_recycler_view);
+        mRecyclerView = findViewById(R.id.patient_profile_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecycllerview.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
         mPatientProfileAdapter = new PatientProfileAdapter(this);
-        mRecycllerview.setAdapter(mPatientProfileAdapter);
-        RecyclerView.ItemDecoration dividerItemDecoration  = new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL);
-        mRecycllerview.addItemDecoration(dividerItemDecoration);
+        mRecyclerView.setAdapter(mPatientProfileAdapter);
+        mRecyclerView.getRecycledViewPool().setMaxRecycledViews(PatientProfileAdapter.TYPE_HEADER, 0);
+        mPatientProfileAdapter.setProfileHeaderIconClickListener(new ProfileHeaderIconClickOperator(this,
+                GlobalFactory.getUserSessionInterface().getUsername()));
     }
 
     private void setupBluetoothServiceCallbacks() {
@@ -109,11 +168,14 @@ public class PatientActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (mBPMText != null) {
-                            mBPMText.setText(String.format(Locale.CANADA, "%s BPM", data));
-                        }
+                        mPatientProfileAdapter.setPatientBPM(data);
                     }
                 });
+            }
+
+            @Override
+            public void onDataReceived(final byte[] data, int offset, int size) {
+                Log.d(TAG, "Not doing anything with byte data");
             }
         });
     }
@@ -126,28 +188,20 @@ public class PatientActivity extends AppCompatActivity {
                 uploadUserProfileImageButtonClick();
             }
         });
-
-        mProfileImage.setOnLoadCompleteListener(new FadeInNetworkImageView.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete() {
-                Log.d(TAG, "Loading image complete");
-            }
-        });
-
     }
 
     private void uploadUserProfileImageButtonClick() {
-        if (mImageUploader.isSendingImage()) {
+        if (mImageOperator.isSendingImage()) {
             Toast.makeText(getApplicationContext(), "Please wait while image is loading", Toast.LENGTH_SHORT).show();
             return;
         }
-        mImageUploader.dispatchTakePhotoIntent(this);
+        mImageOperator.dispatchTakePhotoIntent(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == UserProfileOperator.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            mImageUploader.uploadUserProfileImage(this, new UserProfileImageListener() {
+            mImageOperator.uploadUserProfileImage(this, new UserProfileImageListener() {
                 @Override
                 public void onUserProfileImageUploaded() {
                     Log.d(TAG, "decoding uploaded image");
@@ -157,7 +211,7 @@ public class PatientActivity extends AppCompatActivity {
                             mProfileImage.setLocalImageBitmap(bitmap);
                         }
                     });
-                    bitmapDecodeTask.execute(mImageUploader.getCurrentPhotoPath());
+                    bitmapDecodeTask.execute(mImageOperator.getCurrentPhotoPath());
                 }
             });
         }
@@ -166,7 +220,7 @@ public class PatientActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mImageUploader.deleteCurrentPhoto();
+        mImageOperator.deleteCurrentPhoto();
         doUnbindService();
     }
 }

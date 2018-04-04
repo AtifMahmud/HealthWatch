@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <include layout="@layout/content_profile_info"/>
+    <include layout="@layout/content_care_taker_profile_info"/>
 
     <View
         android:id="@+id/caretaker_info_divider"
@@ -15,7 +15,7 @@
 
     <TextView
         android:id="@+id/header"
-        android:layout_below="@+id/caretaker_info_divider"
+        android:layout_below="@id/caretaker_info_divider"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"

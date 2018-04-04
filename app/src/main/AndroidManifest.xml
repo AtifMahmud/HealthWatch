@@ -3,6 +3,7 @@
     package="com.cpen391.healthwatch">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <!--
@@ -45,8 +46,6 @@
             android:name=".caretaker.CareTakerActivity"
             android:label="@string/title_activity_care_taker"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".user.SignUpActivity" />
-        <activity android:name=".user.LoginActivity" />
 
         <service
             android:name=".bluetooth.BluetoothService"
@@ -82,16 +81,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <activity
-
-            android:name=".patient.PatientMeals"
-            android:label="@string/title_activity_patient_meals"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
-            android:name=".mealplan.MealPlanActivity"/>
+        <activity android:name=".mealplan.MealPlanActivity"/>
         <activity android:name=".patient.PatientProfileActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".caretaker.CareTakerProfileActivity"/>
 
     </application>
 

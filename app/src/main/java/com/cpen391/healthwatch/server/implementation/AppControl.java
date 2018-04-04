@@ -31,7 +31,8 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Created by william on 2018/3/6.
@@ -91,16 +92,15 @@ public class AppControl implements AppControlInterface {
             Certificate ca = cf.generateCertificate(caInput);
 
             String keyStoreType = KeyStore.getDefaultType();
+            Log.d(TAG,"keyStoreType: " + keyStoreType);
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", ca);
 
-            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-            tmf.init(keyStore);
+            X509TrustManager customTrustManager = new CustomTrustManager(keyStore);
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmf.getTrustManagers(), null);
+            sslContext.init(null, new TrustManager[]{customTrustManager}, null);
             return sslContext.getSocketFactory();
         } catch (IOException | CertificateException | KeyStoreException |
                 NoSuchAlgorithmException | KeyManagementException e) {

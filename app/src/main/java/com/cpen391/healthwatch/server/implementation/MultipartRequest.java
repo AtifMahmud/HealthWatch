@@ -22,6 +22,8 @@ import java.util.Map;
 /**
  * Created by william on 2018/1/25.
  * A class that allows you to send binary files to a http server using volley.
+ *
+ * Adapted from github: https://gist.github.com/anggadarkprince/a7c536da091f4b26bb4abf2f92926594
  */
 public class MultipartRequest extends Request<String> {
     private final String TWO_HYPHENS = "--";
