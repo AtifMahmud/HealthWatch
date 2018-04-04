@@ -31,6 +31,7 @@ import com.cpen391.healthwatch.util.BitmapDecodeTask;
 import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
+import com.cpen391.healthwatch.util.LocationMethods;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +47,7 @@ public class PatientActivity extends AppCompatActivity {
     private boolean mShouldUnbindBluetooth;
     private BluetoothService mBluetoothService;
     private UserProfileOperator mImageOperator;
+    private LocationMethods mLocationOperator;
 
     private RecyclerView mRecyclerView;
     private PatientProfileAdapter mPatientProfileAdapter;
@@ -86,6 +88,7 @@ public class PatientActivity extends AppCompatActivity {
         setContentView(R.layout.activity_patient);
 
         mImageOperator = new UserProfileOperator();
+        mLocationOperator = new LocationMethods(this);
         mProfileImage = findViewById(R.id.image_cover);
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(GlobalFactory.getUserSessionInterface().getUsername());
@@ -94,6 +97,9 @@ public class PatientActivity extends AppCompatActivity {
         doBindService();
         setupRecyclerView();
         getProfileInfoFromServer();
+        Intent data = getIntent();
+        String locationDataJSON = data.getStringExtra("location");
+        mLocationOperator.setLocationData(locationDataJSON);
     }
 
     private void getProfileInfoFromServer() {
@@ -125,8 +131,20 @@ public class PatientActivity extends AppCompatActivity {
             vh.mProfilePhoneNumber.setText(phoneNumber);
             vh.mProfileCaretakerName.setVisibility(View.INVISIBLE);
             vh.mProfileCaretakerName.setText(caretaker);
+            vh.mProfileLocationText.setVisibility(View.INVISIBLE);
+            vh.mProfileLocationLabel.setVisibility(View.INVISIBLE);
+            String city = mLocationOperator.getCity();
+            if (city != null) {
+                vh.mProfileLocationText.setText(mLocationOperator.getCity());
+            }
+            String locationUpdateTime = mLocationOperator.getTimeLastUpdated();
+            if (locationUpdateTime != null) {
+                vh.mProfileLocationLabel.setText(locationUpdateTime);
+            }
             AnimationOperator.fadeInAnimation(vh.mProfilePhoneNumber);
             AnimationOperator.fadeInAnimation(vh.mProfileCaretakerName);
+            AnimationOperator.fadeInAnimation(vh.mProfileLocationText);
+            AnimationOperator.fadeInAnimation(vh.mProfileLocationLabel);
         } catch (JSONException e) {
             e.printStackTrace();
         }

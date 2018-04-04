@@ -143,6 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_location_default"
+                android:visibility="invisible"
                 android:layout_marginTop="16dp"
                 android:textSize="20sp"/>
 
@@ -151,6 +152,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_location_last_update_default"
+                android:visibility="invisible"
                 android:textColor="@color/gray"
                 android:textSize="16sp"/>
         </LinearLayout>

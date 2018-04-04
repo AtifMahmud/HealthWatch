@@ -131,6 +131,8 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         ImageView mProfileCaretakerIcon;
         TextView mProfilePhoneNumber;
         TextView mProfileCaretakerName;
+        TextView mProfileLocationText;
+        TextView mProfileLocationLabel;
         TextView mHeaderText;
 
         HeaderViewHolder(View view) {
@@ -140,8 +142,9 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mProfilePhoneIcon = view.findViewById(R.id.profile_phone_icon);
             mProfileLocationIcon = view.findViewById(R.id.profile_location_icon);
             mProfileCaretakerIcon = view.findViewById(R.id.profile_caretaker_icon);
+            mProfileLocationText = view.findViewById(R.id.profile_location);
+            mProfileLocationLabel = view.findViewById(R.id.profile_location_last_update);
             mHeaderText = view.findViewById(R.id.header);
-
             mHeaderText.setText(R.string.meal_list_header);
             setListeners();
         }

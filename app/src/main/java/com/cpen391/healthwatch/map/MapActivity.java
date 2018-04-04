@@ -453,6 +453,7 @@ public class MapActivity extends FragmentActivity implements
                         break;
                     default:
                         intent = new Intent(MapActivity.this, PatientActivity.class);
+                        intent.putExtra("location", getLocationJSON(getLastBestLocation()));
                         startActivityForResult(intent, REQUEST_PATIENT_ACTIVITY);
                 }
             }
