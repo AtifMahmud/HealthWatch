@@ -46,8 +46,6 @@
             android:name=".caretaker.CareTakerActivity"
             android:label="@string/title_activity_care_taker"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".user.SignUpActivity" />
-        <activity android:name=".user.LoginActivity" />
 
         <service
             android:name=".bluetooth.BluetoothService"
@@ -82,12 +80,11 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider><![CDATA[
-
-        android:name=".mealplan.MealPlanActivity"/>
-        ]]>
+        </provider>
+        <activity android:name=".mealplan.MealPlanActivity"/>
         <activity android:name=".patient.PatientProfileActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".caretaker.CareTakerProfileActivity"/>
 
     </application>
 

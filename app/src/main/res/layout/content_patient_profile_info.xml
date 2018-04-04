@@ -67,7 +67,7 @@
                 android:id="@+id/profile_bpm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100 BPM"
+                android:text="@string/profile_bpm_default"
                 android:layout_marginTop="16dp"
                 android:textSize="20sp"/>
 
@@ -75,7 +75,7 @@
                 android:id="@+id/profile_bpm_last_update"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="max/min within last hour"
+                android:text="@string/profile_bpm_label_default"
                 android:textColor="@color/gray"
                 android:textSize="16sp"/>
         </LinearLayout>
@@ -106,14 +106,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Mark"
                 android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/profile_caretaker_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="caretaker"
+                android:text="@string/profile_care_taker_label"
                 android:textColor="@color/gray"
                 android:textSize="16sp"/>
         </LinearLayout>
@@ -143,7 +142,7 @@
                 android:id="@+id/profile_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vancouver"
+                android:text="@string/profile_location_default"
                 android:layout_marginTop="16dp"
                 android:textSize="20sp"/>
 
@@ -151,14 +150,11 @@
                 android:id="@+id/profile_location_last_update"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="updated 5 seconds ago"
+                android:text="@string/profile_location_last_update_default"
                 android:textColor="@color/gray"
                 android:textSize="16sp"/>
         </LinearLayout>
     </LinearLayout>
-
-
-
 </LinearLayout>
 
 

@@ -1,8 +1,6 @@
 package com.cpen391.healthwatch.patient;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -30,10 +28,18 @@ import java.util.List;
  */
 
 public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public interface ProfileHeaderIconClickListener {
+        void onPhoneIconClick(String phoneNumber);
+        void onCaretakerIconClick(String caretaker);
+        void onLocationIconClick();
+    }
+
     static final int TYPE_HEADER = 0;
     private static final int TYPE_MEAL_ITEM = 1;
     private Context mContext;
     private HeaderViewHolder mHeaderViewHolder;
+
+    private ProfileHeaderIconClickListener mListener;
 
     private List<JSONObject> mMealList;
 
@@ -77,6 +83,10 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         }
     }
 
+    void setProfileHeaderIconClickListener(ProfileHeaderIconClickListener listener) {
+        mListener = listener;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -96,6 +106,9 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (holder instanceof MealViewHolder) {
             MealViewHolder vh = (MealViewHolder) holder;
             vh.bind(mMealList.get(position - 1));
+        } else if (holder instanceof HeaderViewHolder) {
+            HeaderViewHolder vh = (HeaderViewHolder) holder;
+            vh.bind();
         }
     }
 
@@ -114,25 +127,53 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
         ImageView mProfilePhoneIcon;
+        ImageView mProfileLocationIcon;
+        ImageView mProfileCaretakerIcon;
         TextView mProfilePhoneNumber;
+        TextView mProfileCaretakerName;
         TextView mHeaderText;
 
         HeaderViewHolder(View view) {
             super(view);
             mProfilePhoneNumber = view.findViewById(R.id.profile_phone_number);
+            mProfileCaretakerName = view.findViewById(R.id.profile_caretaker);
             mProfilePhoneIcon = view.findViewById(R.id.profile_phone_icon);
+            mProfileLocationIcon = view.findViewById(R.id.profile_location_icon);
+            mProfileCaretakerIcon = view.findViewById(R.id.profile_caretaker_icon);
             mHeaderText = view.findViewById(R.id.header);
 
             mHeaderText.setText(R.string.meal_list_header);
+            setListeners();
+        }
+
+        void bind() {
+            setListeners();
+        }
+
+        private void setListeners() {
             mProfilePhoneIcon.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String phoneNumber = mProfilePhoneNumber.getText().toString();
-                    if (!phoneNumber.isEmpty()) {
-                        String uri = "tel:" + phoneNumber;
-                        Intent intent = new Intent(Intent.ACTION_DIAL);
-                        intent.setData(Uri.parse(uri));
-                        mContext.startActivity(intent);
+                    if (mListener != null) {
+                        String phoneNumber = mProfilePhoneNumber.getText().toString();
+                        mListener.onPhoneIconClick(phoneNumber);
+                    }
+                }
+            });
+            mProfileLocationIcon.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) {
+                        mListener.onLocationIconClick();
+                    }
+                }
+            });
+            mProfileCaretakerIcon.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) {
+                        String caretaker = mProfileCaretakerName.getText().toString();
+                        mListener.onCaretakerIconClick(caretaker);
                     }
                 }
             });

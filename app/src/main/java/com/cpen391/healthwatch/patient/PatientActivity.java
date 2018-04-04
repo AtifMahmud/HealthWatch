@@ -6,11 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -33,14 +31,10 @@ import com.cpen391.healthwatch.util.BitmapDecodeTask;
 import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
-import com.cpen391.healthwatch.util.StandardDividerItemDecoration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,12 +116,17 @@ public class PatientActivity extends AppCompatActivity {
     private void setupUserProfile(String response) {
         try {
             mImageOperator.getUserProfileImage(response, mProfileImage);
-            JSONObject userDataJSON = new JSONObject(response).getJSONObject("data");
+            JSONObject userObj = new JSONObject(response);
+            JSONObject userDataJSON = userObj.getJSONObject("data");
             String phoneNumber = userDataJSON.getString("phone");
+            String caretaker = userObj.getJSONArray("caretaker").getString(0);
             HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
             vh.mProfilePhoneNumber.setVisibility(View.INVISIBLE);
             vh.mProfilePhoneNumber.setText(phoneNumber);
+            vh.mProfileCaretakerName.setVisibility(View.INVISIBLE);
+            vh.mProfileCaretakerName.setText(caretaker);
             AnimationOperator.fadeInAnimation(vh.mProfilePhoneNumber);
+            AnimationOperator.fadeInAnimation(vh.mProfileCaretakerName);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -140,6 +139,8 @@ public class PatientActivity extends AppCompatActivity {
         mPatientProfileAdapter = new PatientProfileAdapter(this);
         mRecyclerView.setAdapter(mPatientProfileAdapter);
         mRecyclerView.getRecycledViewPool().setMaxRecycledViews(PatientProfileAdapter.TYPE_HEADER, 0);
+        mPatientProfileAdapter.setProfileHeaderIconClickListener(new ProfileHeaderIconClickOperator(this,
+                GlobalFactory.getUserSessionInterface().getUsername()));
     }
 
     private void setupBluetoothServiceCallbacks() {

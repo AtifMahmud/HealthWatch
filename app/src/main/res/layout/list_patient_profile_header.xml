@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <include
-        layout="@layout/content_profile_info"/>
+        layout="@layout/content_patient_profile_info"/>
 
     <View
         android:id="@+id/patient_info_divider"
