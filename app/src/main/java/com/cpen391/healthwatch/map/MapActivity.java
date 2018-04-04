@@ -39,6 +39,7 @@ import com.cpen391.healthwatch.map.implementation.CustomGoogleMap;
 import com.cpen391.healthwatch.map.marker.IconMarker;
 import com.cpen391.healthwatch.map.marker.animation.MarkerAnimator;
 import com.cpen391.healthwatch.patient.PatientActivity;
+import com.cpen391.healthwatch.patient.ProfileHeaderIconClickOperator;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserSessionInterface;
@@ -86,6 +87,9 @@ public class MapActivity extends FragmentActivity implements
     private final int REQUEST_ENABLE_BLUETOOTH = 2;
     private final int REQUEST_BLUETOOTH_SETTINGS = 3;
     private final int REQUEST_CHECK_LOCATION_SETTINGS = 4;
+    private final int REQUEST_PATIENT_ACTIVITY = 5;
+
+    private final float MARKER_DISPLAY_ZOOM_LEVEL = 15.0f;
 
     private MapInterface mMap;
     private List<IconMarker> mCurrentIcons;
@@ -370,6 +374,35 @@ public class MapActivity extends FragmentActivity implements
             } else {
                 Toast.makeText(this, "Location update disabled", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == REQUEST_PATIENT_ACTIVITY) {
+            if (resultCode == ProfileHeaderIconClickOperator.LOCATION_ICON_CLICK) {
+                String username = data.getStringExtra("username");
+                animateToUserLocation(username);
+            }
+        }
+    }
+
+    private void animateToUserLocation(String username) {
+        Log.d(TAG, "Animating to " + username + "'s location");
+        LatLng position = null;
+        if (GlobalFactory.getUserSessionInterface().getUsername().equals(username)) {
+            Location loc = getLastBestLocation();
+            Log.d(TAG, "Last location: " + loc);
+            if (loc != null) {
+                position = new LatLng(loc.getLatitude(), loc.getLongitude());
+            }
+        } else {
+            for (MarkerInterface userMarker : mUserMarkers) {
+                if (userMarker.getTitle().equals(username)) {
+                    position = userMarker.getPosition();
+                    break;
+                }
+            }
+        }
+        if (position != null) {
+            mMap.animateCamera(position.latitude, position.longitude, MARKER_DISPLAY_ZOOM_LEVEL);
+        } else {
+            Log.d(TAG, "User location not found");
         }
     }
 
@@ -416,11 +449,13 @@ public class MapActivity extends FragmentActivity implements
                 switch (GlobalFactory.getUserSessionInterface().getUserType()) {
                     case UserSessionInterface.CARETAKER:
                         intent = new Intent(MapActivity.this, CareTakerActivity.class);
+                        startActivity(intent);
                         break;
                     default:
                         intent = new Intent(MapActivity.this, PatientActivity.class);
+                        intent.putExtra("location", getLocationJSON(getLastBestLocation()));
+                        startActivityForResult(intent, REQUEST_PATIENT_ACTIVITY);
                 }
-                startActivity(intent);
             }
         });
         mLocationCallback = new LocationCallback() {
@@ -504,7 +539,6 @@ public class MapActivity extends FragmentActivity implements
     }
 
     private void checkToUpdateMarkers() {
-        final float MARKER_DISPLAY_ZOOM_LEVEL = 15.0f;
         LatLng currentCenter = mMap.getCameraLocationCenter();
         if (mMap.getCameraZoomLevel() > MARKER_DISPLAY_ZOOM_LEVEL) {
             final double MAX_DEVIATION_DIST = 500;
@@ -589,22 +623,18 @@ public class MapActivity extends FragmentActivity implements
     private Location getLastBestLocation() {
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            long GPSLocationTime = 0;
-            if (null != locationGPS) {
-                GPSLocationTime = locationGPS.getTime();
+            List<String> providers = mLocationManager.getProviders(true);
+            Location bestLocation = null;
+            for (String provider : providers) {
+                Location l = mLocationManager.getLastKnownLocation(provider);
+                if (l == null) {
+                    continue;
+                }
+                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                    bestLocation = l;
+                }
             }
-            long NetLocationTime = 0;
-            if (null != locationNet) {
-                NetLocationTime = locationNet.getTime();
-            }
-            if (0 < GPSLocationTime - NetLocationTime) {
-                return locationGPS;
-            } else {
-                return locationNet;
-            }
+            return bestLocation;
         }
         return null;
     }
@@ -613,6 +643,7 @@ public class MapActivity extends FragmentActivity implements
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
+            Log.d(TAG, "Setting location manager");
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{permission.ACCESS_FINE_LOCATION},

@@ -36,7 +36,7 @@
     <string name="select_healthwatch_device">Please select HealthWatch device to connect to</string>
     <string name="health_watch">HealthWatch2</string>
 
-    <string name="default_bpm_message">HealthWatch Not Connected</string>
+    <string name="default_bpm_message">BPM: None</string>
     <string name="patients_list_header">Patients</string>
 
     <string name="patient_meal_plan_edit_image_view_desc">PatientMealPlanEditImageViewDesc</string>
@@ -56,5 +56,17 @@
     <string name="mobile">Mobile</string>
 
     <string name="profile_phone_image_desc">CareTakerPhoneImageDesc</string>
+    <string name="profile_heart_image_desc">ProfileHeartImageDesc</string>
+    <string name="profile_caretaker_image_desc">ProfileCaretakerImageDesc</string>
+    <string name="profile_location_image_desc">ProfileLocationImageDesc</string>
+    <string name="profile_care_taker_label">caretaker</string>
+    <string name="profile_bpm_default">0 BPM</string>
+    <string name="profile_bpm_label_default">not connected to healthwatch</string>
+    <string name="profile_bpm_label_max">max within last hour</string>
+    <string name="profile_location_default">Earth</string>
+    <string name="profile_location_last_update_default">location services disabled</string>
+    <string name="meal_list_header">Meals</string>
+
+    <string name="single_meal_item_bullet_dot_image_desc">SingleMealItemBulletDotImageDesc</string>
 
 </resources>

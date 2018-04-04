@@ -2,18 +2,27 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
-    <include layout="@layout/content_profile_info"/>
+    <include
+        layout="@layout/content_patient_profile_info"/>
+
+    <View
+        android:id="@+id/patient_info_divider"
+        android:layout_marginTop="16dp"
+        android:layout_below="@id/content_profile_info_layout"
+        android:layout_width="match_parent"
+        android:background="@drawable/full_divider"
+        android:layout_height="wrap_content"/>
 
     <TextView
-        android:id="@+id/BPM"
-        android:layout_below="@id/profile_info_linear_layout"
+        android:id="@+id/header"
+        android:layout_below="@+id/patient_info_divider"
+        android:paddingTop="8dp"
+        android:layout_marginStart="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="23dp"
-        android:text="@string/default_bpm_message"
-        android:textSize="30sp" />
+        android:textColor="@color/gray54"
+        android:textSize="24sp"/>
 
 </RelativeLayout>

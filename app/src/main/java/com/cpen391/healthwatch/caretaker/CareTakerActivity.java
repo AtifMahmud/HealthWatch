@@ -30,6 +30,7 @@ import com.cpen391.healthwatch.util.BitmapDecodeTask;
 import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
+import com.cpen391.healthwatch.util.StandardDividerItemDecoration;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +70,7 @@ public class CareTakerActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mPatientListAdapter = new PatientListAdapter(this);
         mRecyclerView.setAdapter(mPatientListAdapter);
-        ItemDecoration dividerItemDecoration = new PatientListDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
+        ItemDecoration dividerItemDecoration = new StandardDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 

@@ -51,29 +51,6 @@ public class UserProfileOperator {
         return mCurrentPhotoPath;
     }
 
-    /**
-     * Sets up the user profile by loading the user's image from the server and then setting that
-     * image in a fade in network image view.
-     * @param profileImage the Image View to place image once image location is retrieved from server.
-     */
-    public void setupUserProfileImage(final FadeInNetworkImageView profileImage) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
-        GlobalFactory.getServerInterface().asyncGet("/gateway/user/image", headers, new ServerCallback() {
-            @Override
-            public void onSuccessResponse(String response) {
-                getUserProfileImage(response, profileImage);
-            }
-        }, new ServerErrorCallback() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (error.networkResponse != null && error.networkResponse.statusCode == 404) {
-                    Log.d(TAG, "No user profile image found");
-                }
-            }
-        });
-    }
-
     public void getUserProfileImage(String imageFilePathJson, FadeInNetworkImageView profileImage) {
         try {
             String imageFilePath = new JSONObject(imageFilePathJson).getString("image");
@@ -97,6 +74,7 @@ public class UserProfileOperator {
                     Log.d(TAG, "Image deleted");
                 }
             }
+            mCurrentPhotoPath = null;
         }
     }
 
