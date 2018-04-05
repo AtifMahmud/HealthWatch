@@ -75,7 +75,7 @@ public class PatientProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void getPatientBPM(String username){
+    private void getPatientBPM(String username) {
         Map<String, String> headers = new HashMap<>();
         headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
         String path = String.format(Locale.CANADA, "/gateway/user/%s", username);
