@@ -26,15 +26,11 @@ import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserProfileOperator;
 import com.cpen391.healthwatch.user.UserProfileOperator.UserProfileImageListener;
-import com.cpen391.healthwatch.util.AnimationOperator;
 import com.cpen391.healthwatch.util.BitmapDecodeTask;
 import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.LocationMethods;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -120,37 +116,12 @@ public class PatientActivity extends AppCompatActivity {
     }
 
     private void setupUserProfile(String response) {
-        try {
-            mImageOperator.getUserProfileImage(response, mProfileImage);
-            JSONObject userObj = new JSONObject(response);
-            JSONObject userDataJSON = userObj.getJSONObject("data");
-            String phoneNumber = userDataJSON.getString("phone");
-            String caretaker = userObj.getJSONArray("caretaker").getString(0);
-            HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
-            vh.mProfilePhoneNumber.setVisibility(View.INVISIBLE);
-            vh.mProfilePhoneNumber.setText(phoneNumber);
-            vh.mProfileCaretakerName.setVisibility(View.INVISIBLE);
-            vh.mProfileCaretakerName.setText(caretaker);
-            vh.mProfileLocationText.setVisibility(View.INVISIBLE);
-            vh.mProfileLocationLabel.setVisibility(View.INVISIBLE);
-            String city = mLocationOperator.getCity();
-            if (city != null) {
-                vh.mProfileLocationText.setText(mLocationOperator.getCity());
-            }
-            String locationUpdateTime = mLocationOperator.getTimeLastUpdated();
-            if (locationUpdateTime != null) {
-                vh.mProfileLocationLabel.setText(locationUpdateTime);
-            }
-            AnimationOperator.fadeInAnimation(vh.mProfilePhoneNumber);
-            AnimationOperator.fadeInAnimation(vh.mProfileCaretakerName);
-            AnimationOperator.fadeInAnimation(vh.mProfileLocationText);
-            AnimationOperator.fadeInAnimation(vh.mProfileLocationLabel);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        mImageOperator.getUserProfileImage(response, mProfileImage);
+        HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
+        ProfileHeaderOperator.displayProfileHeaderInfo(response, vh, mLocationOperator);
     }
 
-    private void setupRecyclerView(){
+    private void setupRecyclerView() {
         mRecyclerView = findViewById(R.id.patient_profile_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);

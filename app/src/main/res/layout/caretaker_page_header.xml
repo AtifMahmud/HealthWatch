@@ -8,7 +8,7 @@
 
     <View
         android:id="@+id/caretaker_info_divider"
-        android:layout_below="@id/profile_info_linear_layout"
+        android:layout_below="@id/content_profile_info_layout"
         android:layout_width="match_parent"
         android:background="@drawable/full_divider"
         android:layout_height="wrap_content"/>
