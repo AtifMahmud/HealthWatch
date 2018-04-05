@@ -168,11 +168,9 @@ public class PatientActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mPatientProfileAdapter.setPatientBPM(data);
                     }
                 });
             }
-
             @Override
             public void onDataReceived(final byte[] data, int offset, int size) {
                 Log.d(TAG, "Not doing anything with byte data");

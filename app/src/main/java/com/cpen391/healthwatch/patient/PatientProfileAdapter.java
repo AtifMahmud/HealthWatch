@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -75,12 +74,6 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         JSONObject meal2 = getTestMeal("Dinner", "7:00 PM", items2);
 
         mMealList.add(meal2);
-    }
-
-    void setPatientBPM(String bpm) {
-        if (mHeaderViewHolder != null) {
-            Log.d("PatientProfileAdapter", "Not implemented");
-        }
     }
 
     void setProfileHeaderIconClickListener(ProfileHeaderIconClickListener listener) {
