@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
@@ -14,12 +13,9 @@ import com.cpen391.healthwatch.patient.PatientProfileAdapter.HeaderViewHolder;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserProfileOperator;
-import com.cpen391.healthwatch.util.AnimationOperator;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.cpen391.healthwatch.util.LocationMethods;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,6 +33,8 @@ public class PatientProfileActivity extends AppCompatActivity {
     private FadeInNetworkImageView mProfileImage;
     private UserProfileOperator mImageOperator;
     private RecyclerView mRecyclerView;
+    private PatientProfileAdapter mPatientProfileAdapter;
+    private LocationMethods mLocationOperator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +48,8 @@ public class PatientProfileActivity extends AppCompatActivity {
 
         setupRecyclerView();
         mImageOperator = new UserProfileOperator();
+        mLocationOperator = new LocationMethods(this);
+        mLocationOperator.setLocationData(getIntent().getStringExtra("location"));
         mProfileImage = findViewById(R.id.image_cover);
         getPatientInfoFromServer();
     }
@@ -76,23 +76,16 @@ public class PatientProfileActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.patient_profile_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        PatientProfileAdapter patientProfileAdapter = new PatientProfileAdapter(this);
-        mRecyclerView.setAdapter(patientProfileAdapter);
+        mPatientProfileAdapter = new PatientProfileAdapter(this);
+        mRecyclerView.setAdapter(mPatientProfileAdapter);
         // Set it so that header is not recycled.
         mRecyclerView.getRecycledViewPool().setMaxRecycledViews(PatientProfileAdapter.TYPE_HEADER, 0);
+        mPatientProfileAdapter.setProfileHeaderIconClickListener(new ProfileHeaderIconClickOperator(this, mPatientName));
     }
 
     private void setupUserProfile(String response) {
-        try {
-            mImageOperator.getUserProfileImage(response, mProfileImage);
-            JSONObject userDataJSON = new JSONObject(response).getJSONObject("data");
-            String phoneNumber = userDataJSON.getString("phone");
-            HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
-            vh.mProfilePhoneNumber.setVisibility(View.INVISIBLE);
-            vh.mProfilePhoneNumber.setText(phoneNumber);
-            AnimationOperator.fadeInAnimation(vh.mProfilePhoneNumber);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        mImageOperator.getUserProfileImage(response, mProfileImage);
+        HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
+        ProfileHeaderOperator.displayProfileHeaderInfo(response, vh, mLocationOperator);
     }
 }

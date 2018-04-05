@@ -21,6 +21,7 @@ import com.cpen391.healthwatch.caretaker.PatientListAdapter.HeaderViewHolder;
 import com.cpen391.healthwatch.caretaker.PatientListAdapter.PatientItemClickListener;
 import com.cpen391.healthwatch.mealplan.MealPlanActivity;
 import com.cpen391.healthwatch.patient.PatientProfileActivity;
+import com.cpen391.healthwatch.patient.ProfileHeaderIconClickOperator;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserProfileOperator;
@@ -41,12 +42,15 @@ import java.util.Map;
 
 public class CareTakerActivity extends AppCompatActivity {
     private final String TAG = CareTakerActivity.class.getSimpleName();
+    public static final String PATIENT_LOCATION_LIST = "patientLocationList";
 
     private static final int REQUEST_EDIT_MEAL_PLAN = 10;
+    private static final int REQUEST_PATIENT_PROFILE_ACTIVITY = 11;
     private UserProfileOperator mImageOperator;
     private FadeInNetworkImageView mProfileImage;
     private PatientListAdapter mPatientListAdapter;
     private RecyclerView mRecyclerView;
+    private Map<String, String> mPatientLocationMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,22 @@ public class CareTakerActivity extends AppCompatActivity {
         setListeners();
         getUserInfoFromServer();
         getPatientsFromServer();
+        setupPatientLocationMap();
+    }
+
+    private void setupPatientLocationMap() {
+        mPatientLocationMap = new HashMap<>();
+        String jsonArrayStr = getIntent().getStringExtra(PATIENT_LOCATION_LIST);
+        Log.d(TAG, "jsonArrayString: " + jsonArrayStr);
+        try {
+            JSONArray jsonArray = new JSONArray(jsonArrayStr);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonPatientLocObj = jsonArray.getJSONObject(i);
+                mPatientLocationMap.put(jsonPatientLocObj.getString("username"), jsonArray.getString(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupRecyclerView() {
@@ -70,6 +90,7 @@ public class CareTakerActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mPatientListAdapter = new PatientListAdapter(this);
         mRecyclerView.setAdapter(mPatientListAdapter);
+        mRecyclerView.getRecycledViewPool().setMaxRecycledViews(PatientListAdapter.TYPE_HEADER, 0);
         ItemDecoration dividerItemDecoration = new StandardDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
     }
@@ -152,9 +173,14 @@ public class CareTakerActivity extends AppCompatActivity {
             public void onProfileClick(String patientName) {
                 Intent intent = new Intent(CareTakerActivity.this, PatientProfileActivity.class);
                 intent.putExtra(PatientProfileActivity.PATIENT_NAME, patientName);
-                startActivity(intent);
+                intent.putExtra("location", getPatientLocationData(patientName));
+                startActivityForResult(intent, REQUEST_PATIENT_PROFILE_ACTIVITY);
             }
         });
+    }
+
+    private String getPatientLocationData(String username) {
+        return mPatientLocationMap.get(username);
     }
 
     private void uploadUserProfileImageButtonClick() {
@@ -183,6 +209,9 @@ public class CareTakerActivity extends AppCompatActivity {
             });
         } else if (requestCode == REQUEST_EDIT_MEAL_PLAN && resultCode == RESULT_OK) {
             sendMealToServer(data.getStringExtra(MealPlanActivity.MEAL_DATA));
+        } else if (requestCode == REQUEST_PATIENT_PROFILE_ACTIVITY && resultCode == ProfileHeaderIconClickOperator.LOCATION_ICON_CLICK) {
+            setResult(ProfileHeaderIconClickOperator.LOCATION_ICON_CLICK, data);
+            finish();
         }
     }
 

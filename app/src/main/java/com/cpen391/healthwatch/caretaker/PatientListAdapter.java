@@ -23,7 +23,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void onProfileClick(String patientName);
     }
 
-    private static final int TYPE_HEADER = 0;
+    static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
     private List<String> mDataset;

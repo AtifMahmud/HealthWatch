@@ -6,6 +6,7 @@ import android.net.Uri;
 
 import com.cpen391.healthwatch.caretaker.CareTakerProfileActivity;
 import com.cpen391.healthwatch.patient.PatientProfileAdapter.ProfileHeaderIconClickListener;
+import com.cpen391.healthwatch.util.GlobalFactory;
 
 /**
  * Created by william on 2018-04-04.
@@ -39,9 +40,12 @@ public class ProfileHeaderIconClickOperator implements ProfileHeaderIconClickLis
     @Override
     public void onCaretakerIconClick(String caretaker) {
         if (!caretaker.isEmpty()) {
-            Intent intent = new Intent(mActivity, CareTakerProfileActivity.class);
-            intent.putExtra("caretaker", caretaker);
-            mActivity.startActivity(intent);
+            // Doesn't allow caretaker to go to their own profile via patient.
+            if (!GlobalFactory.getUserSessionInterface().getUsername().equals(caretaker)) {
+                Intent intent = new Intent(mActivity, CareTakerProfileActivity.class);
+                intent.putExtra("caretaker", caretaker);
+                mActivity.startActivity(intent);
+            }
         }
     }
 

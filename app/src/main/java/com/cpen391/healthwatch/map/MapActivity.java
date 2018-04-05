@@ -21,6 +21,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -88,6 +89,7 @@ public class MapActivity extends FragmentActivity implements
     private final int REQUEST_BLUETOOTH_SETTINGS = 3;
     private final int REQUEST_CHECK_LOCATION_SETTINGS = 4;
     private final int REQUEST_PATIENT_ACTIVITY = 5;
+    private final int REQUEST_CARETAKER_ACTIVITY = 6;
 
     private final float MARKER_DISPLAY_ZOOM_LEVEL = 15.0f;
 
@@ -118,7 +120,8 @@ public class MapActivity extends FragmentActivity implements
     private Timer mLocationRequestTimer;
     private Timer notificationRequestTimer;
 
-    private List<MarkerInterface> mUserMarkers;
+    // Stores the marker and the time that it was last updated.
+    private List<Pair<MarkerInterface, Long>> mUserMarkers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +202,7 @@ public class MapActivity extends FragmentActivity implements
         MarkerInterface marker = userInMarkerList(username);
         if (marker == null) {
             marker = mMap.addMarker(new MarkerOptions().title(username).snippet(snippet).position(position));
-            mUserMarkers.add(marker);
+            mUserMarkers.add(new Pair<>(marker, time));
         } else {
             marker.setSnippet(snippet);
             MarkerAnimator transitionAnimator = GlobalFactory.getAbstractMarkerAnimationFactory()
@@ -290,8 +293,9 @@ public class MapActivity extends FragmentActivity implements
     }
 
     private MarkerInterface userInMarkerList(String username) {
-        for (MarkerInterface marker : mUserMarkers) {
-            if (username.equals(marker.getTitle())) {
+        for (Pair<MarkerInterface, Long> markerPair : mUserMarkers) {
+            MarkerInterface marker = markerPair.first;
+            if (marker != null && username.equals(marker.getTitle())) {
                 return marker;
             }
         }
@@ -379,6 +383,11 @@ public class MapActivity extends FragmentActivity implements
                 String username = data.getStringExtra("username");
                 animateToUserLocation(username);
             }
+        } else if (requestCode == REQUEST_CARETAKER_ACTIVITY) {
+            if (resultCode == ProfileHeaderIconClickOperator.LOCATION_ICON_CLICK) {
+                String username = data.getStringExtra("username");
+                animateToUserLocation(username);
+            }
         }
     }
 
@@ -392,8 +401,9 @@ public class MapActivity extends FragmentActivity implements
                 position = new LatLng(loc.getLatitude(), loc.getLongitude());
             }
         } else {
-            for (MarkerInterface userMarker : mUserMarkers) {
-                if (userMarker.getTitle().equals(username)) {
+            for (Pair<MarkerInterface, Long> userMarkerPair : mUserMarkers) {
+                MarkerInterface userMarker = userMarkerPair.first;
+                if (userMarker != null && userMarker.getTitle().equals(username)) {
                     position = userMarker.getPosition();
                     break;
                 }
@@ -449,7 +459,8 @@ public class MapActivity extends FragmentActivity implements
                 switch (GlobalFactory.getUserSessionInterface().getUserType()) {
                     case UserSessionInterface.CARETAKER:
                         intent = new Intent(MapActivity.this, CareTakerActivity.class);
-                        startActivity(intent);
+                        intent.putExtra(CareTakerActivity.PATIENT_LOCATION_LIST, getUserLocationJSONArrayStr());
+                        startActivityForResult(intent, REQUEST_CARETAKER_ACTIVITY);
                         break;
                     default:
                         intent = new Intent(MapActivity.this, PatientActivity.class);
@@ -471,6 +482,27 @@ public class MapActivity extends FragmentActivity implements
                 }
             }
         };
+    }
+
+    private String getUserLocationJSONArrayStr() {
+        JSONArray jsonArray = new JSONArray();
+        try {
+            for (Pair<MarkerInterface, Long> markerPair : mUserMarkers) {
+                MarkerInterface marker = markerPair.first;
+                if (marker != null) {
+                    LatLng pos = marker.getPosition();
+                    JSONObject userLocationJSON = new JSONObject()
+                            .put("username", marker.getTitle())
+                            .put("lat", pos.latitude)
+                            .put("lng", pos.longitude)
+                            .put("time", markerPair.second);
+                    jsonArray.put(userLocationJSON);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonArray.toString();
     }
 
     /**
