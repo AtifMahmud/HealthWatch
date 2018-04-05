@@ -43,38 +43,21 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private List<JSONObject> mMealList;
 
-    private JSONObject getTestMeal(String title, String time, List<String> items) {
-        JSONObject meal = new JSONObject();
+    public void setMealList(String meals) {
         try {
-            meal.put("title", title);
-            meal.put("time", time);
-            JSONArray temp = new JSONArray(items);
-            meal.put("items", temp);
+            mMealList.clear();
+            JSONArray mealList = new JSONArray(meals);
+            for (int i = 0; i < mealList.length(); i++) {
+                mMealList.add(mealList.getJSONObject(i));
+            }
         } catch (JSONException e){
             e.printStackTrace();
         }
-        return meal;
     }
 
     PatientProfileAdapter(Context context) {
         mMealList = new ArrayList<>();
         mContext = context;
-
-        List<String> items = new ArrayList<>();
-        items.add("Caesar Salad");
-        items.add("Grilled Chicken");
-        JSONObject meal = getTestMeal("Lunch", "12:00 PM", items);
-
-        mMealList.add(meal);
-
-        List<String> items2 = new ArrayList<>();
-        items2.add("Chips");
-        items2.add("Coke");
-        items2.add("Soda");
-        items2.add("Candy");
-        JSONObject meal2 = getTestMeal("Dinner", "7:00 PM", items2);
-
-        mMealList.add(meal2);
     }
 
     void setPatientBPM(String bpm) {
@@ -198,9 +181,13 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         void bind(JSONObject meal) {
             try {
-                mTitle.setText(meal.getString("title"));
-                mTime.setText(meal.getString("time"));
-                JSONArray mealItems = meal.getJSONArray("items");
+                JSONObject diet = meal.getJSONObject("diet");
+                JSONObject time = diet.getJSONObject("time");
+                JSONArray mealItems = diet.getJSONArray("items");
+                int hour = time.getInt("hour");
+                int minute = time.getInt("minute");
+                mTitle.setText(diet.getString("name"));
+                mTime.setText(getTimeString(hour, minute));
                 for (int i = 0; i < mealItems.length(); i++) {
                     TextView tv = (TextView) LayoutInflater.from(mContext)
                             .inflate(R.layout.single_meal_item, (ViewGroup) itemView, false);
@@ -210,6 +197,25 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+
+        private String getTimeString(int hour, int minute) {
+            String ampm;
+            String finalTime;
+            if (hour >= 1 && hour < 12 ) {
+                ampm = "AM";
+            } else if (hour > 12 && hour < 24) {
+                hour = hour - 12;
+                ampm = "PM";
+            } else if (hour == 12) {
+                ampm = "PM";
+            } else {
+                ampm = "AM";
+                hour = 12;
+            }
+
+            finalTime = hour + ":" + minute + " " + ampm;
+            return finalTime;
         }
     }
 }
