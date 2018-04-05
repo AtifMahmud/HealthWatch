@@ -43,6 +43,7 @@ import com.cpen391.healthwatch.patient.PatientActivity;
 import com.cpen391.healthwatch.patient.ProfileHeaderIconClickOperator;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
+import com.cpen391.healthwatch.user.UserSession;
 import com.cpen391.healthwatch.user.UserSessionInterface;
 import com.cpen391.healthwatch.util.Callback;
 import com.cpen391.healthwatch.util.GlobalFactory;
@@ -138,7 +139,9 @@ public class MapActivity extends FragmentActivity implements
         });
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setListeners();
-        setupBluetooth();
+        if (UserSessionInterface.PATIENT.equals(GlobalFactory.getUserSessionInterface().getUserType())) {
+            setupBluetooth();
+        }
         createLocationRequest();
         startLocationUpdates();
         setPeriodicLocationPulling();
@@ -309,7 +312,9 @@ public class MapActivity extends FragmentActivity implements
         notificationRequestTimer.cancel();
 
         stopLocationUpdates();
-        stopBluetoothService();
+        if (UserSession.PATIENT.equals(GlobalFactory.getUserSessionInterface().getUserType())) {
+            stopBluetoothService();
+        }
     }
 
     private void setupBluetooth() {
