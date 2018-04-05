@@ -16,11 +16,13 @@ class BluetoothPacket {
     private byte[] mAudioBuffer;
     private int mAudioBufferIndex;
     private final int mAudioBufferSize;
+    private int mBPM;
 
     BluetoothPacket() {
         mAudioBufferSize = 100 * 1024;
         mAudioBuffer = new byte[mAudioBufferSize];
         mAudioBufferIndex = 0;
+        mBPM = 0;
     }
 
     /**
@@ -70,10 +72,14 @@ class BluetoothPacket {
                     continue; // Too many audio samples not yet cleared.
                 }
                 mAudioBuffer[mAudioBufferIndex++] = buf[i];
+            } else {
+                mBPM = buf[i];
             }
         }
     }
 
-
+    public int getCurrentBPM() {
+        return mBPM;
+    }
 
 }

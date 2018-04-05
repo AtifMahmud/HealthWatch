@@ -109,6 +109,8 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         TextView mProfileCaretakerName;
         TextView mProfileLocationText;
         TextView mProfileLocationLabel;
+        TextView mProfileBPMMaxText;
+        TextView mProfileBPMMinText;
         TextView mHeaderText;
 
         HeaderViewHolder(View view) {
@@ -120,6 +122,8 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mProfileCaretakerIcon = view.findViewById(R.id.profile_caretaker_icon);
             mProfileLocationText = view.findViewById(R.id.profile_location);
             mProfileLocationLabel = view.findViewById(R.id.profile_location_last_update);
+            mProfileBPMMaxText = view.findViewById(R.id.profile_bpm_max);
+            mProfileBPMMinText = view.findViewById(R.id.profile_bpm_min);
             mHeaderText = view.findViewById(R.id.header);
             mHeaderText.setText(R.string.meal_list_header);
             setListeners();
@@ -157,7 +161,6 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 }
             });
         }
-
     }
 
     class MealViewHolder extends RecyclerView.ViewHolder {

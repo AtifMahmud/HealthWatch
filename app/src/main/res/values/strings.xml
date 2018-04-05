@@ -70,14 +70,15 @@
     <string name="profile_caretaker_image_desc">ProfileCaretakerImageDesc</string>
     <string name="profile_location_image_desc">ProfileLocationImageDesc</string>
     <string name="profile_care_taker_label">caretaker</string>
-    <string name="profile_bpm_default">0 BPM</string>
+    <string name="profile_bpm_max_default">Max: 0 BPM</string>
+    <string name="profile_bpm_min_default">Min: 0 BPM</string>
     <string name="profile_bpm_label_default">not connected to healthwatch</string>
-    <string name="profile_bpm_label_max">max within last hour</string>
+    <string name="profile_bpm_max_min_label_default">max/min within 1 hour</string>
     <string name="profile_location_default">Earth</string>
     <string name="profile_location_last_update_default">location services disabled</string>
+
     <string name="meal_list_header">Meals</string>
 
     <string name="single_meal_item_bullet_dot_image_desc">SingleMealItemBulletDotImageDesc</string>
-
-
+    <string name="bpm_label">max/min bpm within 1 hour</string>
 </resources>
