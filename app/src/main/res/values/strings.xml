@@ -56,15 +56,14 @@
     <string name="mobile">Mobile</string>
 
 
-    <string name="bpm_max">Maximum BPM</string>
-    <string name="bpm_max_time">Maximum BPM Time </string>
+    <string name="bpm_max">bpm.max</string>
+    <string name="bpm_max_time">bpm.max.time</string>
 
-    <string name="bpm_min">Minimum BPM</string>
-    <string name="bpm_min_time">Minimum BPM Time </string>
+    <string name="bpm_min">bpm.min</string>
+    <string name="bpm_min_time">bpm.min.time</string>
 
-    <string name="bpm_most_recent">Most Recent BPM</string>
-    <string name="bpm_most_recent_time">Most Recent BPM Time </string>
-
+    <string name="bpm_most_recent">bpm.most.recent</string>
+    <string name="bpm_most_recent_time">bpm.most.recent.time</string>
 
     <string name="profile_phone_image_desc">CareTakerPhoneImageDesc</string>
     <string name="profile_heart_image_desc">ProfileHeartImageDesc</string>
