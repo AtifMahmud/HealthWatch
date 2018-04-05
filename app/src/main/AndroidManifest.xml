@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cpen391.healthwatch">
+          package="com.cpen391.healthwatch">
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
@@ -11,16 +11,16 @@
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the 'MyLocation' functionality.
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
+        android:required="false"/>
 
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+        android:maxSdkVersion="18"/>
 
     <application
         android:allowBackup="true"
@@ -33,23 +33,23 @@
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".user.SignUpActivity" />
-        <activity android:name=".user.LoginActivity" />
+        <activity android:name=".user.SignUpActivity"/>
+        <activity android:name=".user.LoginActivity"/>
 
         <activity
             android:name=".caretaker.CareTakerActivity"
             android:label="@string/title_activity_care_taker"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <service
             android:name=".bluetooth.BluetoothService"
-            android:exported="false" />
+            android:exported="false"/>
 
 
         <!--
@@ -62,15 +62,15 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBoIKpzOUBgWx8E8XRSGIIANjBLNMc7Us0" />
+            android:value="AIzaSyBoIKpzOUBgWx8E8XRSGIIANjBLNMc7Us0"/>
 
         <activity
             android:name=".map.MapActivity"
-            android:label="@string/title_activity_custom_icon_maps" />
+            android:label="@string/title_activity_custom_icon_maps"/>
         <activity
             android:name=".patient.PatientActivity"
             android:label="@string/title_activity_patient"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -79,12 +79,16 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/file_paths"/>
         </provider>
+
         <activity android:name=".mealplan.MealPlanActivity"/>
-        <activity android:name=".patient.PatientProfileActivity"
-                  android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".caretaker.CareTakerProfileActivity"/>
+        <activity
+            android:name=".patient.PatientProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".caretaker.CareTakerProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
 

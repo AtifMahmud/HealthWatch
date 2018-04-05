@@ -660,18 +660,20 @@ public class MapActivity extends FragmentActivity implements
     private Location getLastBestLocation() {
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            List<String> providers = mLocationManager.getProviders(true);
-            Location bestLocation = null;
-            for (String provider : providers) {
-                Location l = mLocationManager.getLastKnownLocation(provider);
-                if (l == null) {
-                    continue;
+            if (mLocationManager != null) {
+                List<String> providers = mLocationManager.getProviders(true);
+                Location bestLocation = null;
+                for (String provider : providers) {
+                    Location l = mLocationManager.getLastKnownLocation(provider);
+                    if (l == null) {
+                        continue;
+                    }
+                    if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                        bestLocation = l;
+                    }
                 }
-                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                    bestLocation = l;
-                }
+                return bestLocation;
             }
-            return bestLocation;
         }
         return null;
     }

@@ -1,6 +1,5 @@
 package com.cpen391.healthwatch.caretaker;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,13 +10,13 @@ import android.view.View;
 
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
+import com.cpen391.healthwatch.caretaker.CareTakerProfileAdapter.HeaderViewHolder;
 import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserProfileOperator;
 import com.cpen391.healthwatch.util.AnimationOperator;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
-import com.cpen391.healthwatch.util.StandardDividerItemDecoration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,9 +29,10 @@ import java.util.Map;
  * This activity allows patients to view a caretaker's profile.
  */
 public class CareTakerProfileActivity extends AppCompatActivity {
+    private static final String TAG = CareTakerProfileActivity.class.getSimpleName();
     private String mCaretaker;
     private RecyclerView mRecyclerView;
-    private PatientListAdapter mPatientListAdapter;
+    private CareTakerProfileAdapter mCareTakerProfileAdapter;
     private UserProfileOperator mImageOperator;
     private FadeInNetworkImageView mProfileImage;
 
@@ -48,18 +48,16 @@ public class CareTakerProfileActivity extends AppCompatActivity {
         setupRecyclerView();
         mImageOperator = new UserProfileOperator();
         mProfileImage = findViewById(R.id.image_cover);
-        getCaretakerProfileFromServer();FromServer();
+        getCaretakerProfileFromServer();
     }
 
     private void setupRecyclerView() {
         mRecyclerView = findViewById(R.id.patient_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        mPatientListAdapter = new PatientListAdapter(this);
-        mRecyclerView.setAdapter(mPatientListAdapter);
-       // mRecyclerView.getRecycledViewPosetMaxRecycledViews(PatientListAdapter.TYPE_HEADER, 0);
-        RecyclerView.ItemDecoration dividerItemDecoration = new StandardDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        mCareTakerProfileAdapter = new CareTakerProfileAdapter(this);
+        mRecyclerView.setAdapter(mCareTakerProfileAdapter);
+        mRecyclerView.getRecycledViewPool().setMaxRecycledViews(CareTakerProfileAdapter.TYPE_HEADER, 0);
     }
 
     private void getCaretakerProfileFromServer() {
@@ -69,6 +67,7 @@ public class CareTakerProfileActivity extends AppCompatActivity {
             @Override
             public void onSuccessResponse(String response) {
                 Log.d(TAG, "Obtained caretaker profile: " + response);
+                setupUserProfile(response);
             }
         }, new ServerErrorCallback() {
             @Override
@@ -76,5 +75,19 @@ public class CareTakerProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "Trying to obtain caretaker profile obtained error");
             }
         });
+    }
+
+    private void setupUserProfile(String response) {
+        try {
+            mImageOperator.getUserProfileImage(response, mProfileImage);
+            JSONObject userDataJSON = new JSONObject(response).getJSONObject("data");
+            String phoneNumber = userDataJSON.getString("phone");
+            HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
+            vh.mProfilePhoneNumber.setVisibility(View.INVISIBLE);
+            vh.mProfilePhoneNumber.setText(phoneNumber);
+            AnimationOperator.fadeInAnimation(vh.mProfilePhoneNumber);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
