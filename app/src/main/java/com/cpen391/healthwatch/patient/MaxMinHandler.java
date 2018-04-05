@@ -37,8 +37,6 @@ public class MaxMinHandler {
         mBpmSharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
-
-
     /**
      * Initializes the shared preferences file
      *

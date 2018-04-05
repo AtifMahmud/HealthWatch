@@ -28,7 +28,6 @@ public class BluetoothService extends Service {
 
     public interface OnBluetoothDataListener {
         void onDataReceived(String data);
-        void onDataReceived(byte[] data, int offset, int size);
     }
     public static final String BLUETOOTH_ADDRESS = "BT_ADDR";
     public static final int CONNECT_FAILED = 1;
@@ -139,12 +138,6 @@ public class BluetoothService extends Service {
         }
     }
 
-    public synchronized void sendReceivedData(byte[] data, int offset, int size) {
-        if (mListener != null) {
-            mListener.onDataReceived(data, offset, size);
-        }
-    }
-
     /**
      * Indicate that the connection was lost and notify the UI Activity.
      */
@@ -192,6 +185,7 @@ public class BluetoothService extends Service {
                             mVoiceCommand.processVoice8bit(samples, audioSampleSize);
                         }
                     }
+                    sendReceivedData(Integer.toString(mBluetoothPacket.getCurrentBPM()));
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     onConnectionLost();

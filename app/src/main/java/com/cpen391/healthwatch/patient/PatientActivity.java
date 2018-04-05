@@ -26,6 +26,7 @@ import com.cpen391.healthwatch.server.abstraction.ServerCallback;
 import com.cpen391.healthwatch.server.abstraction.ServerErrorCallback;
 import com.cpen391.healthwatch.user.UserProfileOperator;
 import com.cpen391.healthwatch.user.UserProfileOperator.UserProfileImageListener;
+import com.cpen391.healthwatch.util.AnimationOperator;
 import com.cpen391.healthwatch.util.BitmapDecodeTask;
 import com.cpen391.healthwatch.util.BitmapDecodeTask.ImageDecodeCallback;
 import com.cpen391.healthwatch.util.FadeInNetworkImageView;
@@ -33,6 +34,7 @@ import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.LocationMethods;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PatientActivity extends AppCompatActivity {
@@ -47,6 +49,9 @@ public class PatientActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private PatientProfileAdapter mPatientProfileAdapter;
+    // Delegates the bpm keeping functionality
+    private MaxMinHandler mBpmOperator;
+
 
     private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
         @Override
@@ -96,6 +101,8 @@ public class PatientActivity extends AppCompatActivity {
         Intent data = getIntent();
         String locationDataJSON = data.getStringExtra("location");
         mLocationOperator.setLocationData(locationDataJSON);
+        mBpmOperator = new MaxMinHandler(this);
+        mBpmOperator.init();
     }
 
     private void getProfileInfoFromServer() {
@@ -139,14 +146,30 @@ public class PatientActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        mBpmOperator.update(data, System.currentTimeMillis());
+                        setMaxMinBPM();
                     }
                 });
             }
-            @Override
-            public void onDataReceived(final byte[] data, int offset, int size) {
-                Log.d(TAG, "Not doing anything with byte data");
-            }
         });
+    }
+
+    private void setMaxMinBPM() {
+        String maxBPM = mBpmOperator.getMax();
+        String minBPM = mBpmOperator.getMin();
+        String maxBpmDisplayString = String.format(Locale.CANADA, "Max: %s BPM", maxBPM);
+        String minBpmDisplayString = String.format(Locale.CANADA, "Min: %s BPM", minBPM);
+        HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
+        if (vh != null) {
+            vh.mProfileBPMMaxText.setText(maxBpmDisplayString);
+            vh.mProfileBPMMinText.setText(minBpmDisplayString);
+            if (vh.mProfileBPMMaxText.getVisibility() == View.INVISIBLE) {
+                AnimationOperator.fadeInAnimation(vh.mProfileBPMMaxText);
+            }
+            if (vh.mProfileBPMMinText.getVisibility() == View.INVISIBLE) {
+                AnimationOperator.fadeInAnimation(vh.mProfileBPMMinText);
+            }
+        }
     }
 
     private void setListeners() {
@@ -190,6 +213,7 @@ public class PatientActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         mImageOperator.deleteCurrentPhoto();
+        mBpmOperator.save();
         doUnbindService();
     }
 }
