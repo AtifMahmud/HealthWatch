@@ -33,6 +33,8 @@ import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.LocationMethods;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -188,6 +190,24 @@ public class PatientActivity extends AppCompatActivity {
             return;
         }
         mImageOperator.dispatchTakePhotoIntent(this);
+    }
+
+    private void updatePatientBPM(JSONObject bpm) {
+        Log.d(TAG, "Updating patient's BPM");
+        String bpmString = bpm.toString();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        GlobalFactory.getServerInterface().asyncPost("/gateway/bpm", headers, bpmString, new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "updating user bpm obtained response: " + response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "updating user bpm obtained error");
+            }
+        });
     }
 
     @Override

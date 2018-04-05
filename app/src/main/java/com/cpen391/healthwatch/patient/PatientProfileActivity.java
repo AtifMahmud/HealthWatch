@@ -17,6 +17,9 @@ import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.LocationMethods;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -70,6 +73,40 @@ public class PatientProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "Trying to obtain user profile obtained error");
             }
         });
+    }
+
+    private void getPatientBPM(String username) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+        String path = String.format(Locale.CANADA, "/gateway/user/%s", username);
+        GlobalFactory.getServerInterface().asyncGet(path, headers, new ServerCallback() {
+            @Override
+            public void onSuccessResponse(String response) {
+                Log.d(TAG, "Obtained BPM response: " + response);
+                parseBPM(response);
+            }
+        }, new ServerErrorCallback() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "getting patient BPM obtained error");
+            }
+        });
+    }
+
+    private void parseBPM(String response) {
+        try {
+            JSONObject userProfile = new JSONObject(response);
+            JSONObject bpmObj = userProfile.getJSONObject("bpm");
+            String maxBPM = bpmObj.getString("max");
+            String minBPM = bpmObj.getString("min");
+            setBPMText(maxBPM, minBPM);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setBPMText(String maxBPM, String minBPM) {
+
     }
 
     private void setupRecyclerView() {
