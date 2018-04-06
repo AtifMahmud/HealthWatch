@@ -17,6 +17,7 @@ import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.LocationMethods;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -106,8 +107,10 @@ public class PatientProfileActivity extends AppCompatActivity {
     }
 
     private void setBPMText(String maxBPM, String minBPM) {
-
+        // Not implemented.
+        Log.d(TAG, "Set BPM Text not implemented");
     }
+
 
     private void setupRecyclerView() {
         mRecyclerView = findViewById(R.id.patient_profile_recycler_view);
@@ -124,5 +127,15 @@ public class PatientProfileActivity extends AppCompatActivity {
         mImageOperator.getUserProfileImage(response, mProfileImage);
         HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
         ProfileHeaderOperator.displayProfileHeaderInfo(response, vh, mLocationOperator);
+        setupMealList(response);
+    }
+
+    private void setupMealList(String response) {
+        try {
+            JSONArray dietList = new JSONObject(response).getJSONArray("diet");
+            mPatientProfileAdapter.setMealList(dietList);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

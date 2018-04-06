@@ -57,9 +57,7 @@ public class LocationMethods {
             Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
             Log.d(TAG, "address: " + addresses);
-            String addressLine = addresses.get(0).getAddressLine(0);
-            Log.d(TAG, "addressLine: " + addressLine);
-            cityName = addressLine.split(",")[1].trim();
+            cityName = addresses.get(0).getLocality();
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
             return null;

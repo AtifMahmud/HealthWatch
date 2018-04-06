@@ -42,10 +42,9 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private List<JSONObject> mMealList;
 
-    public void setMealList(String meals) {
+    void setMealList(JSONArray mealList)  {
         try {
             mMealList.clear();
-            JSONArray mealList = new JSONArray(meals);
             for (int i = 0; i < mealList.length(); i++) {
                 mMealList.add(mealList.getJSONObject(i));
             }
@@ -177,12 +176,11 @@ public class PatientProfileAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
         void bind(JSONObject meal) {
             try {
-                JSONObject diet = meal.getJSONObject("diet");
-                JSONObject time = diet.getJSONObject("time");
-                JSONArray mealItems = diet.getJSONArray("items");
+                JSONObject time = meal.getJSONObject("time");
+                JSONArray mealItems = meal.getJSONArray("items");
                 int hour = time.getInt("hour");
                 int minute = time.getInt("minute");
-                mTitle.setText(diet.getString("name"));
+                mTitle.setText(meal.getString("name"));
                 mTime.setText(getTimeString(hour, minute));
                 for (int i = 0; i < mealItems.length(); i++) {
                     TextView tv = (TextView) LayoutInflater.from(mContext)
