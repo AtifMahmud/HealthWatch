@@ -469,7 +469,7 @@ public class MapActivity extends FragmentActivity implements
                         break;
                     default:
                         intent = new Intent(MapActivity.this, PatientActivity.class);
-                        intent.putExtra("location", getLocationJSON(getLastBestLocation()));
+                        intent.putExtra("location", getLocationJSONElapsed(getLastBestLocation()));
                         startActivityForResult(intent, REQUEST_PATIENT_ACTIVITY);
                 }
             }
@@ -511,6 +511,28 @@ public class MapActivity extends FragmentActivity implements
     }
 
     /**
+     * @param location location of the user.
+     * @return the json location string required to display user's location in profile.
+     */
+    private String getLocationJSONElapsed(Location location) {
+        if (location != null) {
+            long time = location.getElapsedRealtimeNanos();
+            double lat = location.getLatitude();
+            double lng = location.getLongitude();
+            try {
+                return new JSONObject()
+                        .put("elapsedTime", time)
+                        .put("lat", lat)
+                        .put("lng", lng)
+                        .toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return "{}";
+    }
+
+    /**
      * Sends the location of the user to the server.
      *
      * @param location location of the user, must not be null.
@@ -531,18 +553,20 @@ public class MapActivity extends FragmentActivity implements
      * @return the json location string required to update user's location on the server.
      */
     private String getLocationJSON(Location location) {
-        long time = location.getTime();
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        try {
-            return new JSONObject()
-                    .put("id", GlobalFactory.getUserSessionInterface().getUsername())
-                    .put("time", time)
-                    .put("lat", lat)
-                    .put("lng", lng)
-                    .toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (location != null) {
+            long time = location.getTime();
+            double lat = location.getLatitude();
+            double lng = location.getLongitude();
+            try {
+                return new JSONObject()
+                        .put("id", GlobalFactory.getUserSessionInterface().getUsername())
+                        .put("time", time)
+                        .put("lat", lat)
+                        .put("lng", lng)
+                        .toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return "{}";
     }
@@ -660,18 +684,20 @@ public class MapActivity extends FragmentActivity implements
     private Location getLastBestLocation() {
         if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            List<String> providers = mLocationManager.getProviders(true);
-            Location bestLocation = null;
-            for (String provider : providers) {
-                Location l = mLocationManager.getLastKnownLocation(provider);
-                if (l == null) {
-                    continue;
+            if (mLocationManager != null) {
+                List<String> providers = mLocationManager.getProviders(true);
+                Location bestLocation = null;
+                for (String provider : providers) {
+                    Location l = mLocationManager.getLastKnownLocation(provider);
+                    if (l == null) {
+                        continue;
+                    }
+                    if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                        bestLocation = l;
+                    }
                 }
-                if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                    bestLocation = l;
-                }
+                return bestLocation;
             }
-            return bestLocation;
         }
         return null;
     }

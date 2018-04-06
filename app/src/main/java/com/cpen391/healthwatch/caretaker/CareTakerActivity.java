@@ -17,8 +17,8 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.cpen391.healthwatch.R;
-import com.cpen391.healthwatch.caretaker.PatientListAdapter.HeaderViewHolder;
-import com.cpen391.healthwatch.caretaker.PatientListAdapter.PatientItemClickListener;
+import com.cpen391.healthwatch.caretaker.CareTakerProfileAdapter.HeaderViewHolder;
+import com.cpen391.healthwatch.caretaker.CareTakerProfileAdapter.PatientItemClickListener;
 import com.cpen391.healthwatch.mealplan.MealPlanActivity;
 import com.cpen391.healthwatch.patient.PatientProfileActivity;
 import com.cpen391.healthwatch.patient.ProfileHeaderIconClickOperator;
@@ -48,7 +48,7 @@ public class CareTakerActivity extends AppCompatActivity {
     private static final int REQUEST_PATIENT_PROFILE_ACTIVITY = 11;
     private UserProfileOperator mImageOperator;
     private FadeInNetworkImageView mProfileImage;
-    private PatientListAdapter mPatientListAdapter;
+    private CareTakerProfileAdapter mCareTakerProfileAdapter;
     private RecyclerView mRecyclerView;
     private Map<String, String> mPatientLocationMap;
 
@@ -88,9 +88,9 @@ public class CareTakerActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.patient_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
-        mPatientListAdapter = new PatientListAdapter(this);
-        mRecyclerView.setAdapter(mPatientListAdapter);
-        mRecyclerView.getRecycledViewPool().setMaxRecycledViews(PatientListAdapter.TYPE_HEADER, 0);
+        mCareTakerProfileAdapter = new CareTakerProfileAdapter(this);
+        mRecyclerView.setAdapter(mCareTakerProfileAdapter);
+        mRecyclerView.getRecycledViewPool().setMaxRecycledViews(CareTakerProfileAdapter.TYPE_HEADER, 0);
         ItemDecoration dividerItemDecoration = new StandardDividerItemDecoration(getApplicationContext(), R.drawable.inset_divider);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
     }
@@ -147,7 +147,7 @@ public class CareTakerActivity extends AppCompatActivity {
         try {
             JSONArray patients = new JSONArray(response);
             for (int i = 0; i < patients.length(); i++) {
-                mPatientListAdapter.addPatient(patients.getString(i));
+                mCareTakerProfileAdapter.addPatient(patients.getString(i));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -162,7 +162,7 @@ public class CareTakerActivity extends AppCompatActivity {
                 uploadUserProfileImageButtonClick();
             }
         });
-        mPatientListAdapter.setOnPatientItemClickListener(new PatientItemClickListener() {
+        mCareTakerProfileAdapter.setOnPatientItemClickListener(new PatientItemClickListener() {
             @Override
             public void onEditClick(String patientName) {
                 Intent intent = new Intent(CareTakerActivity.this, MealPlanActivity.class);

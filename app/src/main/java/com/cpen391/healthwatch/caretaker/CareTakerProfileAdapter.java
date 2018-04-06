@@ -17,7 +17,7 @@ import com.cpen391.healthwatch.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CareTakerProfileAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public interface PatientItemClickListener {
         void onEditClick(String patientName);
         void onProfileClick(String patientName);
@@ -30,7 +30,7 @@ public class PatientListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private PatientItemClickListener mListener;
     private Context mContext;
 
-    PatientListAdapter(Context context) {
+    CareTakerProfileAdapter(Context context) {
         mDataset = new ArrayList<>();
         mContext = context;
     }
