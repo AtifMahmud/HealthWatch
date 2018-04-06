@@ -469,7 +469,7 @@ public class MapActivity extends FragmentActivity implements
                         break;
                     default:
                         intent = new Intent(MapActivity.this, PatientActivity.class);
-                        intent.putExtra("location", getLocationJSON(getLastBestLocation()));
+                        intent.putExtra("location", getLocationJSONElapsed(getLastBestLocation()));
                         startActivityForResult(intent, REQUEST_PATIENT_ACTIVITY);
                 }
             }
@@ -508,6 +508,28 @@ public class MapActivity extends FragmentActivity implements
             e.printStackTrace();
         }
         return jsonArray.toString();
+    }
+
+    /**
+     * @param location location of the user.
+     * @return the json location string required to display user's location in profile.
+     */
+    private String getLocationJSONElapsed(Location location) {
+        if (location != null) {
+            long time = location.getElapsedRealtimeNanos();
+            double lat = location.getLatitude();
+            double lng = location.getLongitude();
+            try {
+                return new JSONObject()
+                        .put("elapsedTime", time)
+                        .put("lat", lat)
+                        .put("lng", lng)
+                        .toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return "{}";
     }
 
     /**
