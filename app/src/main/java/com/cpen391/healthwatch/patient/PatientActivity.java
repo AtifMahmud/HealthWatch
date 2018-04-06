@@ -33,11 +33,15 @@ import com.cpen391.healthwatch.util.FadeInNetworkImageView;
 import com.cpen391.healthwatch.util.GlobalFactory;
 import com.cpen391.healthwatch.util.LocationMethods;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PatientActivity extends AppCompatActivity {
     private String TAG = PatientActivity.class.getSimpleName();
@@ -53,6 +57,9 @@ public class PatientActivity extends AppCompatActivity {
     private PatientProfileAdapter mPatientProfileAdapter;
     // Delegates the bpm keeping functionality
     private MaxMinHandler mBpmOperator;
+    private boolean mBPMSet;
+
+    private Timer mBpmUpdateTimer;
 
 
     private ServiceConnection mBluetoothServiceConnection = new ServiceConnection() {
@@ -99,12 +106,27 @@ public class PatientActivity extends AppCompatActivity {
         setListeners();
         doBindService();
         setupRecyclerView();
+        // setupPeriodicBPMServerUpdate();
         getProfileInfoFromServer();
         Intent data = getIntent();
         String locationDataJSON = data.getStringExtra("location");
         mLocationOperator.setLocationData(locationDataJSON);
         mBpmOperator = new MaxMinHandler(this);
         mBpmOperator.init();
+        mBPMSet = false;
+    }
+
+    /**
+     * Set up the periodic bpm updates to the server.
+     */
+    private void setupPeriodicBPMServerUpdate() {
+        mBpmUpdateTimer = new Timer();
+        mBpmUpdateTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updatePatientBPM();
+            }
+        }, 5000, 60000);
     }
 
     private void getProfileInfoFromServer() {
@@ -128,6 +150,16 @@ public class PatientActivity extends AppCompatActivity {
         mImageOperator.getUserProfileImage(response, mProfileImage);
         HeaderViewHolder vh = (HeaderViewHolder) mRecyclerView.findViewHolderForAdapterPosition(0);
         ProfileHeaderOperator.displayProfileHeaderInfo(response, vh, mLocationOperator);
+        setupMealList(response);
+    }
+
+    private void setupMealList(String response) {
+        try {
+            JSONArray dietList = new JSONObject(response).getJSONArray("diet");
+            mPatientProfileAdapter.setMealList(dietList);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupRecyclerView() {
@@ -165,11 +197,10 @@ public class PatientActivity extends AppCompatActivity {
         if (vh != null) {
             vh.mProfileBPMMaxText.setText(maxBpmDisplayString);
             vh.mProfileBPMMinText.setText(minBpmDisplayString);
-            if (vh.mProfileBPMMaxText.getVisibility() == View.INVISIBLE) {
+            if (!mBPMSet) {
                 AnimationOperator.fadeInAnimation(vh.mProfileBPMMaxText);
-            }
-            if (vh.mProfileBPMMinText.getVisibility() == View.INVISIBLE) {
                 AnimationOperator.fadeInAnimation(vh.mProfileBPMMinText);
+                mBPMSet = true;
             }
         }
     }
@@ -192,22 +223,29 @@ public class PatientActivity extends AppCompatActivity {
         mImageOperator.dispatchTakePhotoIntent(this);
     }
 
-    private void updatePatientBPM(JSONObject bpm) {
-        Log.d(TAG, "Updating patient's BPM");
-        String bpmString = bpm.toString();
-        Map<String, String> headers = new HashMap<>();
-        headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
-        GlobalFactory.getServerInterface().asyncPost("/gateway/bpm", headers, bpmString, new ServerCallback() {
-            @Override
-            public void onSuccessResponse(String response) {
-                Log.d(TAG, "updating user bpm obtained response: " + response);
-            }
-        }, new ServerErrorCallback() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, "updating user bpm obtained error");
-            }
-        });
+    private void updatePatientBPM() {
+        try {
+            Log.d(TAG, "Updating patient's BPM");
+            String bpmString = new JSONObject()
+                    .put("max", mBpmOperator.getMax())
+                    .put("min", mBpmOperator.getMin())
+                    .toString();
+            Map<String, String> headers = new HashMap<>();
+            headers.put("token", GlobalFactory.getUserSessionInterface().getUserToken());
+            GlobalFactory.getServerInterface().asyncPost("/gateway/bpm", headers, bpmString, new ServerCallback() {
+                @Override
+                public void onSuccessResponse(String response) {
+                    Log.d(TAG, "updating user bpm obtained response: " + response);
+                }
+            }, new ServerErrorCallback() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.i(TAG, "updating user bpm obtained error");
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

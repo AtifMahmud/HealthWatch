@@ -169,10 +169,12 @@ public class BluetoothService extends Service {
         @Override
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
-
+            long timer = System.currentTimeMillis();
+            final int BPM_UPDATE_INTERVAL = 500;
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
+                    //Log.d(TAG," reading bluetooth data");
                     mBluetoothPacket.readData(mmInputStream);
                     if (mBluetoothPacket.getAudioLength() >= 5) {
                         int audioSampleSize = mBluetoothPacket.getAudioSampleSize();
@@ -185,7 +187,10 @@ public class BluetoothService extends Service {
                             mVoiceCommand.processVoice8bit(samples, audioSampleSize);
                         }
                     }
-                    sendReceivedData(Integer.toString(mBluetoothPacket.getCurrentBPM()));
+                    if (System.currentTimeMillis() - timer > BPM_UPDATE_INTERVAL) {
+                        sendReceivedData(Integer.toString(mBluetoothPacket.getCurrentBPM()));
+                        timer = System.currentTimeMillis();
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     onConnectionLost();

@@ -55,6 +55,7 @@ class BluetoothPacket {
         final int BUF_SIZE = 1024;
         byte[] buf = new byte[BUF_SIZE];
         int bytes = inputStream.read(buf);
+        //Log.d(TAG, "Read bytes: " + bytes);
         if (bytes < 0) {
             throw new IOException("End of stream reached");
         } else {

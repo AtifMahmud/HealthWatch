@@ -17,6 +17,8 @@ import android.widget.TimePicker;
 
 import com.cpen391.healthwatch.R;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -72,11 +74,11 @@ public class MealPlanFormAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
      * @return the list of meal items that user inputted. This ignores the meal items
      * that the user didn't input.
      */
-    List<String> getMealItems() {
-        List<String> mealItems = new ArrayList<>();
+    JSONArray getMealItems() {
+        JSONArray mealItems = new JSONArray();
         for (String mealItem : mMealItems) {
             if (!mealItem.isEmpty()) {
-                mealItems.add(mealItem);
+                mealItems.put(mealItem);
             }
         }
         return mealItems;

@@ -531,18 +531,20 @@ public class MapActivity extends FragmentActivity implements
      * @return the json location string required to update user's location on the server.
      */
     private String getLocationJSON(Location location) {
-        long time = location.getTime();
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        try {
-            return new JSONObject()
-                    .put("id", GlobalFactory.getUserSessionInterface().getUsername())
-                    .put("time", time)
-                    .put("lat", lat)
-                    .put("lng", lng)
-                    .toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (location != null) {
+            long time = location.getTime();
+            double lat = location.getLatitude();
+            double lng = location.getLongitude();
+            try {
+                return new JSONObject()
+                        .put("id", GlobalFactory.getUserSessionInterface().getUsername())
+                        .put("time", time)
+                        .put("lat", lat)
+                        .put("lng", lng)
+                        .toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return "{}";
     }
