@@ -3,6 +3,7 @@ package com.cpen391.healthwatch.util;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -69,7 +70,10 @@ public class LocationMethods {
         if (mLocationData != null) {
             try {
                 JSONObject locationJSON = new JSONObject(mLocationData);
-                return getTimeLastUpdated(locationJSON.getLong("time"));
+                if (locationJSON.has("time")) {
+                    return getTimeLastUpdated(locationJSON.getLong("time"), System.currentTimeMillis());
+                }
+                return getTimeLastUpdated(locationJSON.getLong("elapsedTime") / 1000000, SystemClock.elapsedRealtimeNanos() / 1000000);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -77,8 +81,7 @@ public class LocationMethods {
         return null;
     }
 
-    private String getTimeLastUpdated(long lastUpdated) {
-        long currentTime = System.currentTimeMillis();
+    private String getTimeLastUpdated(long lastUpdated, long currentTime) {
         Log.d(TAG, "current time: " + currentTime);
         Log.d(TAG, "last updated time: " + lastUpdated);
         long difference  = currentTime - lastUpdated;
